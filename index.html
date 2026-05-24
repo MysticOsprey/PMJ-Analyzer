@@ -314,8 +314,50 @@
       margin-bottom: 9px;
       font-size: 13px;
       line-height: 1.6;
+      transition: border-color .2s, opacity .2s;
     }
-    .sug-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); font-weight: 700; margin-bottom: 4px; }
+    .suggestion-list li.applied {
+      border-left-color: var(--green);
+      opacity: 0.65;
+    }
+    .sug-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); font-weight: 700; margin-bottom: 6px; }
+    .suggestion-list li.applied .sug-label { color: var(--green); }
+    .sug-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 9px; gap: 10px; }
+    .btn-apply {
+      padding: 5px 14px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid var(--accent);
+      background: rgba(200,151,58,.12);
+      color: var(--accent2);
+      white-space: nowrap;
+      transition: background .15s, color .15s;
+      flex-shrink: 0;
+    }
+    .btn-apply:hover { background: rgba(200,151,58,.28); }
+    .btn-apply:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-apply.done { border-color: var(--green); background: rgba(63,185,80,.12); color: var(--green); }
+
+    .copy-script-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+    }
+    .btn-copy-script {
+      padding: 7px 18px;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid var(--green);
+      background: rgba(63,185,80,.12);
+      color: var(--green);
+      transition: background .15s;
+    }
+    .btn-copy-script:hover { background: rgba(63,185,80,.25); }
 
     /* ── Empty state ── */
     .empty-state { text-align: center; padding: 36px 20px; color: var(--muted); }
@@ -523,7 +565,10 @@ Paste anything — a sales email, a follow-up script, a pitch, or a text message
         </div>
       </div>
       <div class="tab-panel" id="tab-suggestions">
-        <div class="section-label" style="margin-bottom:10px">Contextual Rewrites</div>
+        <div class="copy-script-wrap">
+          <div class="section-label" style="margin-bottom:0">Contextual Rewrites — click Apply to edit your script live</div>
+          <button class="btn-copy-script" onclick="copyScript()">Copy Script</button>
+        </div>
         <ul class="suggestion-list" id="suggestion-list"></ul>
       </div>
 
@@ -770,20 +815,31 @@ function analyze() {
 
   // Suggestions
   var suggs = CONTEXT_SUGGESTIONS[context] || CONTEXT_SUGGESTIONS.general;
+  // Build full suggestion objects including targeted tips
+  var hasMissing = function(id) { for (var i=0;i<missing.length;i++) if(missing[i].id===id) return true; return false; };
+
+  var allSuggs = [];
+  for (var i = 0; i < suggs.length; i++) allSuggs.push(suggs[i]);
+  if (hasMissing(23)) allSuggs.push({ label:'Close stronger',         weak:'', strong:'Just out of curiosity — what would make this a yes for you today?', mode:'append' });
+  if (hasMissing(4))  allSuggs.push({ label:'Add loss aversion',      weak:'', strong:'How would you feel if this opportunity wasn\'t available by next week?', mode:'append' });
+  if (hasMissing(16)) allSuggs.push({ label:'Remove decision friction',weak:'', strong:'What happens next is we\'ll get your details confirmed and I\'ll send everything over today.', mode:'append' });
+
+  // Store suggestions globally so apply buttons can reference them
+  window._pmjSuggs = allSuggs;
+
   var sl = '';
-  for (var i = 0; i < suggs.length; i++) {
-    var s = suggs[i];
-    sl += '<li>';
+  for (var i = 0; i < allSuggs.length; i++) {
+    var s = allSuggs[i];
+    sl += '<li id="sug-item-' + i + '">';
     sl += '<div class="sug-label">' + s.label + '</div>';
     if (s.weak) sl += '<div style="color:var(--red);font-size:12px;margin-bottom:4px">&#x2717; &ldquo;' + s.weak + '&rdquo;</div>';
     sl += '<div style="color:var(--green)">&#x2713; &ldquo;' + s.strong + '&rdquo;</div>';
+    sl += '<div class="sug-footer">';
+    sl += '<span style="font-size:11px;color:var(--muted)">' + (s.weak ? 'Replaces weak phrase in your script' : 'Appended to end of your script') + '</span>';
+    sl += '<button class="btn-apply" id="sug-btn-' + i + '" onclick="applySuggestion(' + i + ')">Apply &rarr;</button>';
+    sl += '</div>';
     sl += '</li>';
   }
-  // Targeted tips
-  var hasMissing = function(id) { for (var i=0;i<missing.length;i++) if(missing[i].id===id) return true; return false; };
-  if (hasMissing(23)) sl += '<li><div class="sug-label">Close stronger</div><div style="color:var(--blue)">Add: &ldquo;Just out of curiosity &mdash; what would make this a yes for you today?&rdquo;</div></li>';
-  if (hasMissing(4))  sl += '<li><div class="sug-label">Add loss aversion</div><div style="color:var(--blue)">Ask: &ldquo;How would you feel if this opportunity wasn\'t available by next week?&rdquo;</div></li>';
-  if (hasMissing(16)) sl += '<li><div class="sug-label">Remove decision friction</div><div style="color:var(--blue)">End with: &ldquo;What happens next is we\'ll get your details confirmed and I\'ll send everything over today.&rdquo;</div></li>';
   document.getElementById('suggestion-list').innerHTML = sl;
 
   // Highlight ref cards
@@ -852,6 +908,71 @@ function copyText() {
       setTimeout(function(){ btn.textContent = 'Copy Text'; }, 1500);
     });
   }
+}
+
+function copyScript() {
+  var text = document.getElementById('script-input').value;
+  if (!text.trim()) { alert('No script to copy. Paste or load a script first.'); return; }
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(function() {
+      var btn = document.querySelector('.btn-copy-script');
+      var orig = btn.textContent;
+      btn.textContent = 'Copied to clipboard.';
+      btn.style.background = 'rgba(63,185,80,.3)';
+      setTimeout(function(){
+        btn.textContent = orig;
+        btn.style.background = '';
+      }, 2000);
+    });
+  } else {
+    // Fallback for older browsers
+    var ta = document.getElementById('script-input');
+    ta.select();
+    document.execCommand('copy');
+    alert('Script copied to clipboard.');
+  }
+}
+
+function applySuggestion(idx) {
+  var suggs = window._pmjSuggs;
+  if (!suggs || !suggs[idx]) return;
+  var s   = suggs[idx];
+  var ta  = document.getElementById('script-input');
+  var txt = ta.value;
+
+  if (s.weak && s.weak.trim() !== '') {
+    // Replace mode — find the weak phrase (case-insensitive) and swap it
+    var rx = new RegExp(escapeRegex(s.weak), 'gi');
+    if (rx.test(txt)) {
+      ta.value = txt.replace(rx, s.strong);
+    } else {
+      // Weak phrase not found literally — append instead
+      ta.value = txt.trimEnd() + '\n\n' + s.strong;
+    }
+  } else {
+    // Append mode — add to end with spacing
+    ta.value = txt.trimEnd() + '\n\n' + s.strong;
+  }
+
+  // Mark button as done
+  var btn  = document.getElementById('sug-btn-' + idx);
+  var item = document.getElementById('sug-item-' + idx);
+  if (btn)  { btn.textContent = 'Applied'; btn.classList.add('done'); btn.disabled = true; }
+  if (item) { item.classList.add('applied'); }
+
+  // Flash the textarea to confirm the edit
+  ta.style.borderColor = 'var(--green)';
+  setTimeout(function(){ ta.style.borderColor = ''; }, 800);
+
+  // Scroll textarea to show the change
+  ta.scrollTop = ta.scrollHeight;
+
+  // Re-analyze automatically so score updates
+  setTimeout(analyze, 200);
+}
+
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
 document.addEventListener('keydown', function(e) {
