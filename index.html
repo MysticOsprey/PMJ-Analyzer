@@ -1,0 +1,1222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PMJ Analyzer — Exactly What to Say</title>
+  <style>
+    /* ─── Reset & Base ─────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0d1117;
+      --surface:   #161b22;
+      --card:      #1c2230;
+      --border:    #30363d;
+      --accent:    #c8973a;
+      --accent2:   #e8b96a;
+      --green:     #3fb950;
+      --red:       #f85149;
+      --yellow:    #d29922;
+      --blue:      #58a6ff;
+      --text:      #e6edf3;
+      --muted:     #8b949e;
+      --radius:    10px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 0;
+    }
+
+    /* ─── Header ───────────────────────────────────────────── */
+    header {
+      background: linear-gradient(135deg, #1a1200 0%, #0d1117 60%);
+      border-bottom: 1px solid var(--border);
+      padding: 28px 40px 22px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .logo-badge {
+      width: 52px;
+      height: 52px;
+      background: linear-gradient(135deg, var(--accent), #8b5e1a);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      font-weight: 900;
+      color: #fff;
+      flex-shrink: 0;
+      letter-spacing: -1px;
+    }
+
+    .header-text h1 {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--accent2);
+      letter-spacing: 0.3px;
+    }
+
+    .header-text p {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* ─── Layout ───────────────────────────────────────────── */
+    .main {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 0;
+      height: calc(100vh - 95px);
+    }
+
+    .left-pane {
+      padding: 28px 32px;
+      overflow-y: auto;
+      border-right: 1px solid var(--border);
+    }
+
+    .right-pane {
+      padding: 24px 22px;
+      overflow-y: auto;
+      background: var(--surface);
+    }
+
+    /* ─── Section Labels ───────────────────────────────────── */
+    .section-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.2px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    /* ─── Textarea ─────────────────────────────────────────── */
+    .input-wrap {
+      margin-bottom: 22px;
+    }
+
+    .input-wrap label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .input-wrap label span {
+      font-weight: 400;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    textarea#script-input {
+      width: 100%;
+      min-height: 220px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.65;
+      padding: 14px 16px;
+      resize: vertical;
+      outline: none;
+      transition: border-color .2s;
+      font-family: inherit;
+    }
+
+    textarea#script-input:focus {
+      border-color: var(--accent);
+    }
+
+    textarea#script-input::placeholder {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    /* ─── Toolbar ──────────────────────────────────────────── */
+    .toolbar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 26px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 9px 20px;
+      border-radius: 7px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all .15s;
+      letter-spacing: 0.2px;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #a87820);
+      color: #fff;
+    }
+
+    .btn-primary:hover { filter: brightness(1.12); }
+
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    .btn-ghost:hover { border-color: var(--accent); color: var(--text); }
+
+    .context-select {
+      padding: 9px 14px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      color: var(--text);
+      font-size: 13px;
+      outline: none;
+      cursor: pointer;
+      flex: 1;
+      min-width: 180px;
+    }
+
+    /* ─── Score Ring ───────────────────────────────────────── */
+    .score-block {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 24px;
+      margin-bottom: 22px;
+    }
+
+    .score-ring {
+      position: relative;
+      width: 90px;
+      height: 90px;
+      flex-shrink: 0;
+    }
+
+    .score-ring svg {
+      transform: rotate(-90deg);
+    }
+
+    .score-ring .ring-bg {
+      fill: none;
+      stroke: var(--border);
+      stroke-width: 8;
+    }
+
+    .score-ring .ring-fill {
+      fill: none;
+      stroke-width: 8;
+      stroke-linecap: round;
+      transition: stroke-dasharray 0.8s cubic-bezier(.4,0,.2,1), stroke .3s;
+    }
+
+    .score-number {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--text);
+      line-height: 1;
+    }
+
+    .score-number small {
+      font-size: 10px;
+      font-weight: 400;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .score-meta h2 {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .score-meta p {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 4px;
+      line-height: 1.5;
+    }
+
+    .grade-pill {
+      display: inline-block;
+      padding: 3px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 8px;
+    }
+
+    /* ─── Metrics Row ──────────────────────────────────────── */
+    .metrics-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .metric-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      text-align: center;
+    }
+
+    .metric-card .metric-val {
+      font-size: 26px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .metric-card .metric-label {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    /* ─── Detected / Missing Tags ──────────────────────────── */
+    .tag-section {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      margin-bottom: 16px;
+    }
+
+    .tag-section h3 {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .tag-section h3 .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .tag-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+    }
+
+    .tag {
+      padding: 4px 11px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      border: 1px solid;
+    }
+
+    .tag-found {
+      background: rgba(63,185,80,.12);
+      border-color: rgba(63,185,80,.35);
+      color: var(--green);
+    }
+
+    .tag-missing {
+      background: rgba(248,81,73,.08);
+      border-color: rgba(248,81,73,.25);
+      color: var(--red);
+    }
+
+    /* ─── Highlighted Output ───────────────────────────────── */
+    .highlight-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px 18px;
+      margin-bottom: 22px;
+    }
+
+    .highlight-box h3 {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--muted);
+    }
+
+    #highlighted-output {
+      font-size: 14px;
+      line-height: 1.75;
+      color: var(--text);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    mark {
+      padding: 1px 4px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    /* ─── Suggestions ──────────────────────────────────────── */
+    .suggestion-list {
+      list-style: none;
+    }
+
+    .suggestion-list li {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .suggestion-list li .sug-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent);
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    /* ─── Right Pane: Reference Cards ─────────────────────── */
+    .ref-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      margin-bottom: 10px;
+      cursor: pointer;
+      transition: border-color .15s;
+    }
+
+    .ref-card:hover { border-color: var(--accent); }
+
+    .ref-card.active { border-color: var(--accent); background: rgba(200,151,58,.07); }
+
+    .ref-card .ref-number {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .ref-card .ref-phrase {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      margin-top: 3px;
+    }
+
+    .ref-card .ref-why {
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 5px;
+      line-height: 1.5;
+    }
+
+    .ref-card .ref-example {
+      font-size: 12px;
+      color: var(--blue);
+      font-style: italic;
+      margin-top: 6px;
+      border-left: 2px solid var(--blue);
+      padding-left: 8px;
+      line-height: 1.5;
+      display: none;
+    }
+
+    .ref-card.active .ref-example { display: block; }
+
+    .ref-pillar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .pillar-badge {
+      flex: 1;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 10px;
+      text-align: center;
+    }
+
+    .pillar-badge .pillar-icon { font-size: 22px; }
+    .pillar-badge .pillar-name { font-size: 11px; font-weight: 700; color: var(--accent2); margin-top: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .pillar-badge .pillar-desc { font-size: 11px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
+
+    /* ─── Tabs ─────────────────────────────────────────────── */
+    .tab-bar {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 18px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tab-btn {
+      padding: 8px 16px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--muted);
+      background: none;
+      border: none;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      transition: color .15s, border-color .15s;
+    }
+
+    .tab-btn.active { color: var(--accent2); border-bottom-color: var(--accent); }
+    .tab-btn:hover { color: var(--text); }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    /* ─── Empty State ──────────────────────────────────────── */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--muted);
+    }
+
+    .empty-state .big-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.5; }
+    .empty-state p { font-size: 13px; line-height: 1.7; }
+
+    /* ─── Copy Button ──────────────────────────────────────── */
+    .copy-line {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+
+    .btn-sm {
+      padding: 5px 12px;
+      font-size: 11px;
+      border-radius: 5px;
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .btn-sm:hover { border-color: var(--accent); color: var(--text); }
+
+    /* ─── Pillar Scores ────────────────────────────────────── */
+    .pillar-scores {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 22px;
+    }
+
+    .pillar-score-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .pillar-score-name {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text);
+      width: 90px;
+      flex-shrink: 0;
+    }
+
+    .pillar-bar-wrap {
+      flex: 1;
+      height: 8px;
+      background: var(--border);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .pillar-bar-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.8s cubic-bezier(.4,0,.2,1);
+    }
+
+    .pillar-score-pct {
+      font-size: 12px;
+      font-weight: 700;
+      width: 36px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    /* ─── Scrollbar ────────────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    /* ─── Responsive ───────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .main { grid-template-columns: 1fr; height: auto; }
+      .right-pane { border-top: 1px solid var(--border); }
+      header { padding: 18px 20px 14px; }
+      .left-pane { padding: 20px 18px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── Header ─────────────────────────────────────────────── -->
+<header>
+  <div class="logo-badge">PMJ</div>
+  <div class="header-text">
+    <h1>PMJ Analyzer</h1>
+    <p>Score your sales language against Phil M. Jones' "Exactly What to Say" framework</p>
+  </div>
+</header>
+
+<!-- ─── Main Layout ─────────────────────────────────────────── -->
+<div class="main">
+
+  <!-- LEFT PANE -->
+  <div class="left-pane">
+
+    <!-- Input -->
+    <div class="input-wrap">
+      <label>Paste Your Script, Email, or Conversation <span>— any sales or persuasion text</span></label>
+      <textarea id="script-input" placeholder="Examples:
+
+• 'I'm not sure if it's for you, but we have an exclusive wine club tier opening this month...'
+
+• 'I wanted to follow up on our proposal. Do you have any questions?'
+
+• 'Hi, I wanted to talk to you about our event packages. We have a lot of great options...'
+
+Paste anything — a sales email, a follow-up call script, a pitch, or even a text message."></textarea>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="toolbar">
+      <button class="btn btn-primary" onclick="analyze()">Analyze Script</button>
+      <select class="context-select" id="context-select">
+        <option value="general">Context: General Sales</option>
+        <option value="wine">Context: Wine Club / Hospitality</option>
+        <option value="events">Context: Luxury Events / Venues</option>
+        <option value="followup">Context: Follow-Up / Nurture</option>
+        <option value="objection">Context: Handling Objections</option>
+      </select>
+      <button class="btn btn-ghost" onclick="clearAll()">Clear</button>
+      <button class="btn btn-ghost" onclick="loadDemo()">Load Demo</button>
+    </div>
+
+    <!-- Results Area (hidden until analysis) -->
+    <div id="results" style="display:none">
+
+      <!-- Score Block -->
+      <div class="score-block">
+        <div class="score-ring">
+          <svg width="90" height="90" viewBox="0 0 90 90">
+            <circle class="ring-bg" cx="45" cy="45" r="36"/>
+            <circle class="ring-fill" id="ring-fill" cx="45" cy="45" r="36"
+              stroke-dasharray="0 226" stroke-dashoffset="0"/>
+          </svg>
+          <div class="score-number">
+            <span id="score-number">0</span>
+            <small>/ 100</small>
+          </div>
+        </div>
+        <div class="score-meta">
+          <h2 id="score-headline">Analyzing...</h2>
+          <p id="score-desc">—</p>
+          <div id="grade-pill" class="grade-pill"></div>
+        </div>
+      </div>
+
+      <!-- Metrics Row -->
+      <div class="metrics-row">
+        <div class="metric-card">
+          <div class="metric-val" id="m-found" style="color:var(--green)">0</div>
+          <div class="metric-label">Magic Words Found</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-val" id="m-missing" style="color:var(--red)">0</div>
+          <div class="metric-label">Opportunities Missed</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-val" id="m-words">0</div>
+          <div class="metric-label">Total Words</div>
+        </div>
+      </div>
+
+      <!-- Pillar Scores -->
+      <div class="section-label">Three Pillars Score</div>
+      <div class="pillar-scores" style="margin-bottom:22px">
+        <div class="pillar-score-row">
+          <div class="pillar-score-name">Curiosity</div>
+          <div class="pillar-bar-wrap"><div class="pillar-bar-fill" id="pillar-curiosity" style="background:var(--blue);width:0%"></div></div>
+          <div class="pillar-score-pct" id="pct-curiosity" style="color:var(--blue)">0%</div>
+        </div>
+        <div class="pillar-score-row">
+          <div class="pillar-score-name">Empathy</div>
+          <div class="pillar-bar-wrap"><div class="pillar-bar-fill" id="pillar-empathy" style="background:var(--green);width:0%"></div></div>
+          <div class="pillar-score-pct" id="pct-empathy" style="color:var(--green)">0%</div>
+        </div>
+        <div class="pillar-score-row">
+          <div class="pillar-score-name">Courage</div>
+          <div class="pillar-bar-wrap"><div class="pillar-bar-fill" id="pillar-courage" style="background:var(--accent);width:0%"></div></div>
+          <div class="pillar-score-pct" id="pct-courage" style="color:var(--accent)">0%</div>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab('detected',this)">Detected</button>
+        <button class="tab-btn" onclick="switchTab('missing',this)">Missing</button>
+        <button class="tab-btn" onclick="switchTab('highlighted',this)">Highlighted Text</button>
+        <button class="tab-btn" onclick="switchTab('suggestions',this)">Suggestions</button>
+      </div>
+
+      <!-- Tab: Detected -->
+      <div class="tab-panel active" id="tab-detected">
+        <div class="tag-section">
+          <h3><span class="dot" style="background:var(--green)"></span>Magic Words Detected</h3>
+          <div class="tag-cloud" id="tags-found"></div>
+        </div>
+      </div>
+
+      <!-- Tab: Missing -->
+      <div class="tab-panel" id="tab-missing">
+        <div class="tag-section">
+          <h3><span class="dot" style="background:var(--red)"></span>Phrases You Could Add</h3>
+          <div class="tag-cloud" id="tags-missing"></div>
+        </div>
+      </div>
+
+      <!-- Tab: Highlighted -->
+      <div class="tab-panel" id="tab-highlighted">
+        <div class="highlight-box">
+          <div class="copy-line">
+            <h3>Your Text with Magic Words Highlighted</h3>
+            <button class="btn-sm" onclick="copyHighlighted()">Copy Plain Text</button>
+          </div>
+          <div id="highlighted-output"></div>
+        </div>
+      </div>
+
+      <!-- Tab: Suggestions -->
+      <div class="tab-panel" id="tab-suggestions">
+        <div class="section-label" style="margin-bottom:12px">Contextual Rewrites</div>
+        <ul class="suggestion-list" id="suggestion-list"></ul>
+      </div>
+
+    </div><!-- /results -->
+
+    <!-- Empty state -->
+    <div id="empty-state" class="empty-state">
+      <div class="big-icon">✍</div>
+      <p>Paste any sales script, email, or follow-up message above.<br>
+      The analyzer scores it against Phil M. Jones' 23 Magic Words<br>
+      and Phil's three pillars: <strong>Curiosity, Empathy, and Courage.</strong></p>
+    </div>
+
+  </div><!-- /left-pane -->
+
+  <!-- RIGHT PANE: Reference Library -->
+  <div class="right-pane">
+    <div class="section-label" style="margin-bottom:14px">PMJ Framework Reference</div>
+
+    <!-- Three Pillars -->
+    <div class="ref-pillar">
+      <div class="pillar-badge">
+        <div class="pillar-icon">🔍</div>
+        <div class="pillar-name">Curiosity</div>
+        <div class="pillar-desc">Ask before you tell. Diagnose first.</div>
+      </div>
+      <div class="pillar-badge">
+        <div class="pillar-icon">💡</div>
+        <div class="pillar-name">Empathy</div>
+        <div class="pillar-desc">Respond to what they actually need.</div>
+      </div>
+      <div class="pillar-badge">
+        <div class="pillar-icon">🦁</div>
+        <div class="pillar-name">Courage</div>
+        <div class="pillar-desc">Ask the hard question. Guide forward.</div>
+      </div>
+    </div>
+
+    <div class="section-label" style="margin-bottom:10px">The 23 Magic Words — tap to expand</div>
+    <div id="ref-cards"></div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+// ─────────────────────────────────────────────────────────────
+// PMJ MAGIC WORDS DATABASE
+// ─────────────────────────────────────────────────────────────
+const MAGIC_WORDS = [
+  {
+    id: 1, phrase: "I'm not sure if it's for you, but",
+    triggers: ["not sure if it", "not sure if this is for you", "might not be for you"],
+    why: "Removes pressure — the word 'but' negates everything before it, triggering curiosity.",
+    example: "I'm not sure if it's for you, but we have one membership spot opening this month.",
+    pillar: "curiosity", color: "#58a6ff"
+  },
+  {
+    id: 2, phrase: "How open-minded are you",
+    triggers: ["open-minded", "open minded", "be open to", "would you be open"],
+    why: "90%+ of people self-identify as open-minded. Saying no means calling yourself closed.",
+    example: "How open-minded would you be about exploring a venue upgrade for your event?",
+    pillar: "curiosity", color: "#58a6ff"
+  },
+  {
+    id: 3, phrase: "What do you know about",
+    triggers: ["what do you know about", "what do you know of"],
+    why: "Socratic method. Forces them to reveal the basis of their opinion — often exposing uncertainty.",
+    example: "What do you know about the new tier we added to the wine club this season?",
+    pillar: "curiosity", color: "#58a6ff"
+  },
+  {
+    id: 4, phrase: "How would you feel if",
+    triggers: ["how would you feel", "how do you feel if", "what would it feel like"],
+    why: "People decide emotionally first, then logically. Loss aversion activates when they imagine missing out.",
+    example: "How would you feel if your event sold out before you locked in your venue?",
+    pillar: "empathy", color: "#3fb950"
+  },
+  {
+    id: 5, phrase: "Just imagine",
+    triggers: ["just imagine", "imagine how", "picture this", "picture yourself"],
+    why: "Paints a vivid mental picture. The subconscious cannot distinguish imagination from reality.",
+    example: "Just imagine how your guests will feel arriving at Dover Hall in October.",
+    pillar: "curiosity", color: "#58a6ff"
+  },
+  {
+    id: 6, phrase: "When would be a good time",
+    triggers: ["when would be a good time", "when's a good time", "what time works", "when works for you", "best time"],
+    why: "Presupposes a yes. Framing a next step as a scheduling question removes the option to say no.",
+    example: "When would be a good time to do a quick walk-through of the property?",
+    pillar: "courage", color: "#c8973a"
+  },
+  {
+    id: 7, phrase: "I'm guessing you haven't got around to",
+    triggers: ["guessing you haven't", "guessing you have not", "i imagine you haven't", "probably haven't had a chance"],
+    why: "Names the excuse before they use it. They either correct you (good) or commit (better).",
+    example: "I'm guessing you haven't got around to reviewing our wine club options yet?",
+    pillar: "courage", color: "#c8973a"
+  },
+  {
+    id: 8, phrase: "What questions do you have for me",
+    triggers: ["what questions do you have", "questions do you have for me", "any questions for me"],
+    why: "Assumes a decision has been made. 'None' is the easy answer — and signals readiness to move forward.",
+    example: "What questions do you have for me before we get started?",
+    pillar: "courage", color: "#c8973a"
+  },
+  {
+    id: 9, phrase: "you have three options",
+    triggers: ["three options", "three choices", "3 options", "a few options", "couple of options"],
+    why: "Three options prevent paralysis. Place your preferred option last as the path of least resistance.",
+    example: "As I see it, you have three options for your membership tier this year.",
+    pillar: "courage", color: "#c8973a"
+  },
+  {
+    id: 10, phrase: "two types of people",
+    triggers: ["two types of people", "two kinds of people", "2 types of people"],
+    why: "Instant self-identification. The listener immediately wonders which type they are.",
+    example: "There are two types of people who invest in a wine club — those who see it as a purchase, and those who see it as a lifestyle.",
+    pillar: "curiosity", color: "#58a6ff"
+  },
+  {
+    id: 11, phrase: "I bet you're a bit like me",
+    triggers: ["i bet you're", "bet you're like me", "i think you're like me", "sounds like you"],
+    why: "We trust people who are like us. This phrase builds instant rapport before delivering the key idea.",
+    example: "I bet you're a bit like me — you want the experience to feel personal, not transactional.",
+    pillar: "empathy", color: "#3fb950"
+  },
+  {
+    id: 12, phrase: "if you",
+    triggers: ["if you.*then", "if you decide", "if you're ready", "if you can", "if we can"],
+    why: "Conditional commitment. Creates a logical promise the listener can test and accept.",
+    example: "If you decide to join this month, then I can hold your spot through the holiday season.",
+    pillar: "courage", color: "#c8973a"
+  },
+  {
+    id: 13, phrase: "don't worry",
+    triggers: ["don't worry", "do not worry", "no worries about", "nothing to worry about"],
+    why: "Triggers comfort conditioning from childhood. Defuses stress and builds trust instantly.",
+    example: "Don't worry — I'll walk you through every detail before anything is confirmed.",
+    pillar: "empathy", color: "#3fb950"
+  },
+  {
+    id: 14, phrase: "most people",
+    triggers: ["most people", "most of our members", "most clients", "most guests", "most couples"],
+    why: "Social proof. 'I am most people' — triggers the desire to conform to what others do.",
+    example: "Most people in your situation join at the Royal tier to start.",
+    pillar: "empathy", color: "#3fb950"
+  },
+  {
+    id: 15, phrase: "the good news is",
+    triggers: ["the good news is", "good news is", "great news is", "here's the good news"],
+    why: "Injects positivity and signals a positive turn. Works even when there was no bad news.",
+    example: "The good news is we still have availability for your preferred weekend.",
+    pillar: "empathy", color: "#3fb950"
+  },
+  {
+    id: 16, phrase: "what happens next is",
+    triggers: ["what happens next", "next step is", "here's what happens next", "here's what we do next"],
+    why: "Closes the loop with authority. Don't ask what they want to do — tell them the path.",
+    example: "What happens next is we'll confirm your date, and I'll send the details within the hour.",
+    pillar: "courage", color: "#c8973a"
+  },
+  {
+    id: 17, phrase: "what makes you say that",
+    triggers: ["what makes you say", "why do you say that", "what brings you to that", "what led you to"],
+    why: "Never counter an objection directly. Ask a question instead — shifts control back to you.",
+    example: "What makes you say that the price is a concern right now?",
+    pillar: "curiosity", color: "#58a6ff"
+  },
+  {
+    id: 18, phrase: "before you make your mind up",
+    triggers: ["before you make your mind up", "before you decide", "before making a decision", "before you say no"],
+    why: "Moves someone from 'no' to 'maybe' — which is all you need. You can work with maybe.",
+    example: "Before you make your mind up, can we walk through what's included one more time?",
+    pillar: "courage", color: "#c8973a"
+  },
+  {
+    id: 19, phrase: "if I can, will you",
+    triggers: ["if i can.*will you", "if we can.*will you", "if i.*would you", "if we could.*would you"],
+    why: "Removes the stated barrier by taking ownership of it. Communicates power and intention.",
+    example: "If I can match that for you, will you be ready to confirm today?",
+    pillar: "courage", color: "#c8973a"
+  },
+  {
+    id: 20, phrase: "enough",
+    triggers: ["be enough", "is that enough", "enough for you", "would.*enough"],
+    why: "Focuses the brain on a single metric. Makes decisions feel simple and proportionate.",
+    example: "Would two bottles a month be enough to start?",
+    pillar: "curiosity", color: "#58a6ff"
+  },
+  {
+    id: 21, phrase: "just one more thing",
+    triggers: ["just one more thing", "one more thing", "one last thing", "one final thing"],
+    why: "The Columbo close — adds a gentle, unexpected follow-up that often lands the commitment.",
+    example: "Just one more thing — have you had a chance to see the new cellar space?",
+    pillar: "courage", color: "#c8973a"
+  },
+  {
+    id: 22, phrase: "would you do me a favor",
+    triggers: ["do me a favor", "would you do me a favor", "can i ask you a favor", "ask a favor"],
+    why: "People have a built-in desire to help. A favor request opens the door and lowers resistance.",
+    example: "Would you do me a favor and just take a look at the membership overview before you decide?",
+    pillar: "empathy", color: "#3fb950"
+  },
+  {
+    id: 23, phrase: "just out of curiosity",
+    triggers: ["just out of curiosity", "out of curiosity", "i'm curious", "curious to know"],
+    why: "Low-pressure qualifier that gets the real answer. Takes the weight off the question.",
+    example: "Just out of curiosity — what would make this a yes for you today?",
+    pillar: "curiosity", color: "#58a6ff"
+  }
+];
+
+// ─────────────────────────────────────────────────────────────
+// DEMO SCRIPTS
+// ─────────────────────────────────────────────────────────────
+const DEMOS = {
+  general: `Hi Sarah, I just wanted to reach out and follow up on our last conversation about the membership program.
+
+We have some great options available and I think you would really like what we offer. Do you have any questions? Let me know if you want to chat this week.
+
+We also have a promotion going on right now that I think you would be interested in. Let me know what you think.
+
+Thanks for your time.`,
+
+  wine: `Good morning Sarah, this is Robert from 7 Lady Vineyards.
+
+I'm not sure if it's for you, but we have one spot opening in our Monarch tier this month and I would hate for you to miss it.
+
+Just imagine receiving a curated selection at your door four times a year, plus access to private release events.
+
+Most of our Monarch members tell us it's the best decision they made — the value and the experience are unlike anything else in the region.
+
+When would be a good time to walk through what's included? What questions do you have for me?`,
+};
+
+// ─────────────────────────────────────────────────────────────
+// CONTEXT-SPECIFIC SUGGESTIONS
+// ─────────────────────────────────────────────────────────────
+const CONTEXT_SUGGESTIONS = {
+  general: [
+    { label: "Replace weak close", weak: "Let me know what you think", strong: "When would be a good time to talk through the details?" },
+    { label: "Replace passive follow-up", weak: "I think you would really like", strong: "I'm not sure if it's for you, but most people in your situation love what they find." },
+    { label: "Replace permission request", weak: "Do you have any questions?", strong: "What questions do you have for me?" },
+  ],
+  wine: [
+    { label: "Add loss aversion", weak: "", strong: "How would you feel if this tier sold out before you had a chance to try it?" },
+    { label: "Add social proof", weak: "", strong: "Most of our members tell us the first shipment is when they realize the real value." },
+    { label: "Add conditional commitment", weak: "", strong: "If I can hold your spot until Friday, will you be ready to confirm?" },
+  ],
+  events: [
+    { label: "Add identity framing", weak: "", strong: "There are two types of hosts: those who book the first available date, and those who secure the right venue for the story they want to tell." },
+    { label: "Add vision language", weak: "", strong: "Just imagine your guests arriving at dusk with the vineyard lit for dinner." },
+    { label: "Add Columbo close", weak: "", strong: "Just one more thing — have you seen the new courtyard we finished this spring?" },
+  ],
+  followup: [
+    { label: "Disarm the excuse early", weak: "I'm following up", strong: "I'm guessing you haven't got around to reviewing the proposal yet?" },
+    { label: "Re-open the door", weak: "Let me know if you're interested", strong: "Before you make your mind up, can we walk through one more detail?" },
+    { label: "Low-pressure qualifier", weak: "Are you still interested?", strong: "Just out of curiosity — what would make this a yes for you?" },
+  ],
+  objection: [
+    { label: "Never counter directly", weak: "That's not actually the case", strong: "What makes you say that?" },
+    { label: "Remove the stated barrier", weak: "I understand, but...", strong: "If I can take that off the table entirely, will you be ready to move forward?" },
+    { label: "Move from no to maybe", weak: "I hope you'll reconsider", strong: "Before you make your mind up, let's just run through what you'd be saying no to." },
+  ],
+};
+
+// ─────────────────────────────────────────────────────────────
+// BUILD REFERENCE CARDS
+// ─────────────────────────────────────────────────────────────
+function buildRefCards() {
+  const container = document.getElementById('ref-cards');
+  container.innerHTML = MAGIC_WORDS.map((mw, i) => `
+    <div class="ref-card" id="refcard-${mw.id}" onclick="toggleRefCard(${mw.id})">
+      <div class="ref-number">Word ${mw.id} of 23 · ${mw.pillar.charAt(0).toUpperCase()+mw.pillar.slice(1)}</div>
+      <div class="ref-phrase" style="color:${mw.color}">"${mw.phrase}..."</div>
+      <div class="ref-why">${mw.why}</div>
+      <div class="ref-example">Example: "${mw.example}"</div>
+    </div>
+  `).join('');
+}
+
+function toggleRefCard(id) {
+  const card = document.getElementById('refcard-' + id);
+  card.classList.toggle('active');
+}
+
+// ─────────────────────────────────────────────────────────────
+// CORE ANALYSIS ENGINE
+// ─────────────────────────────────────────────────────────────
+function analyze() {
+  const text = document.getElementById('script-input').value.trim();
+  if (!text) {
+    alert("Please paste a script or message to analyze.");
+    return;
+  }
+
+  const lower = text.toLowerCase();
+  const wordCount = text.split(/\s+/).filter(Boolean).length;
+  const context = document.getElementById('context-select').value;
+
+  // Detect magic words
+  const found = [];
+  const missing = [];
+
+  MAGIC_WORDS.forEach(mw => {
+    const hit = mw.triggers.some(t => {
+      try {
+        return new RegExp(t, 'i').test(lower);
+      } catch(e) {
+        return lower.includes(t);
+      }
+    });
+    if (hit) found.push(mw);
+    else missing.push(mw);
+  });
+
+  // Score calculation
+  const rawScore = Math.round((found.length / MAGIC_WORDS.length) * 100);
+  // Bonus for word count (brevity is good in sales)
+  const lengthBonus = wordCount < 150 ? 5 : wordCount > 500 ? -5 : 0;
+  const score = Math.min(100, Math.max(0, rawScore + lengthBonus));
+
+  // Pillar scoring
+  const pillars = { curiosity: 0, empathy: 0, courage: 0 };
+  const pillarTotals = { curiosity: 0, empathy: 0, courage: 0 };
+  MAGIC_WORDS.forEach(mw => { pillarTotals[mw.pillar]++; });
+  found.forEach(mw => { pillars[mw.pillar]++; });
+
+  const pCuriosity = Math.round((pillars.curiosity / pillarTotals.curiosity) * 100);
+  const pEmpathy = Math.round((pillars.empathy / pillarTotals.empathy) * 100);
+  const pCourage = Math.round((pillars.courage / pillarTotals.courage) * 100);
+
+  // Grade
+  let grade, headline, desc, gradeColor;
+  if (score >= 80) { grade = "A"; headline = "High-Influence Script"; desc = "This language is well-calibrated for persuasion. Multiple magic words working together."; gradeColor = "rgba(63,185,80,.2); color:var(--green)"; }
+  else if (score >= 60) { grade = "B"; headline = "Solid Foundation"; desc = "Good use of influence language. A few more magic words would close the gap."; gradeColor = "rgba(88,166,255,.15); color:var(--blue)"; }
+  else if (score >= 40) { grade = "C"; headline = "Room to Improve"; desc = "Some magic words present, but the script leans on general language. Rewrites below will help."; gradeColor = "rgba(210,153,34,.2); color:var(--yellow)"; }
+  else if (score >= 20) { grade = "D"; headline = "Weak Persuasion Signal"; desc = "This script relies on generic language. The subconscious brain has nothing to hook onto."; gradeColor = "rgba(248,81,73,.15); color:var(--red)"; }
+  else { grade = "F"; headline = "No Magic Words Detected"; desc = "This is standard filler language. Apply the PMJ framework to make every word count."; gradeColor = "rgba(248,81,73,.15); color:var(--red)"; }
+
+  // Ring color
+  const ringColor = score >= 70 ? "#3fb950" : score >= 40 ? "#d29922" : "#f85149";
+  const circumference = 2 * Math.PI * 36;
+  const dash = (score / 100) * circumference;
+
+  // ─── Render ────────────────────────────────────────────────
+  document.getElementById('score-number').textContent = score;
+  document.getElementById('score-headline').textContent = headline;
+  document.getElementById('score-desc').textContent = desc;
+  document.getElementById('grade-pill').textContent = "Grade: " + grade;
+  document.getElementById('grade-pill').style.cssText = `background:${gradeColor.split(';')[0].replace('rgba','rgba').trim()};color:${gradeColor.split(':')[2].trim()}`;
+  // fix grad pill styling
+  const gp = document.getElementById('grade-pill');
+  const [bg, clr] = gradeColor.split(';');
+  gp.style.background = bg.trim();
+  gp.style.color = clr.replace('color:', '').trim();
+
+  const rf = document.getElementById('ring-fill');
+  rf.style.stroke = ringColor;
+  rf.style.strokeDasharray = `${dash} ${circumference}`;
+
+  document.getElementById('m-found').textContent = found.length;
+  document.getElementById('m-missing').textContent = missing.length;
+  document.getElementById('m-words').textContent = wordCount;
+
+  // Pillars
+  document.getElementById('pillar-curiosity').style.width = pCuriosity + '%';
+  document.getElementById('pillar-empathy').style.width = pEmpathy + '%';
+  document.getElementById('pillar-courage').style.width = pCourage + '%';
+  document.getElementById('pct-curiosity').textContent = pCuriosity + '%';
+  document.getElementById('pct-empathy').textContent = pEmpathy + '%';
+  document.getElementById('pct-courage').textContent = pCourage + '%';
+
+  // Tags
+  const tagsFound = document.getElementById('tags-found');
+  tagsFound.innerHTML = found.length
+    ? found.map(mw => `<span class="tag tag-found">${mw.phrase}</span>`).join('')
+    : '<span style="color:var(--muted);font-size:13px">None detected</span>';
+
+  const tagsMissing = document.getElementById('tags-missing');
+  tagsMissing.innerHTML = missing.length
+    ? missing.map(mw => `<span class="tag tag-missing">${mw.phrase}</span>`).join('')
+    : '<span style="color:var(--green);font-size:13px">All magic words present.</span>';
+
+  // Highlighted text
+  let highlighted = text;
+  found.forEach(mw => {
+    mw.triggers.forEach(t => {
+      try {
+        const rx = new RegExp(`(${t})`, 'gi');
+        highlighted = highlighted.replace(rx, `<mark style="background:rgba(200,151,58,.25);color:#e8b96a">$1</mark>`);
+      } catch(e) {}
+    });
+  });
+  document.getElementById('highlighted-output').innerHTML = highlighted;
+
+  // Suggestions
+  const suggs = CONTEXT_SUGGESTIONS[context] || CONTEXT_SUGGESTIONS.general;
+  const suggList = document.getElementById('suggestion-list');
+  let items = suggs.map(s => `
+    <li>
+      <div class="sug-label">${s.label}</div>
+      ${s.weak ? `<div style="color:var(--red);font-size:12px;margin-bottom:4px">✗ "${s.weak}"</div>` : ''}
+      <div style="color:var(--green)">✓ "${s.strong}"</div>
+    </li>
+  `);
+  // Add targeted tips based on what's missing
+  if (missing.find(m => m.id === 23)) {
+    items.push(`<li><div class="sug-label">Close stronger</div>Add to your closing: <span style="color:var(--blue)">"Just out of curiosity — what would make this a yes for you today?"</span></li>`);
+  }
+  if (missing.find(m => m.id === 4)) {
+    items.push(`<li><div class="sug-label">Add loss aversion</div>Ask: <span style="color:var(--blue)">"How would you feel if this opportunity wasn't available by next week?"</span></li>`);
+  }
+  if (missing.find(m => m.id === 16)) {
+    items.push(`<li><div class="sug-label">Remove decision friction</div>End with: <span style="color:var(--blue)">"What happens next is we'll get your details confirmed and I'll send everything over today."</span></li>`);
+  }
+  suggList.innerHTML = items.join('');
+
+  // Highlight active ref cards
+  document.querySelectorAll('.ref-card').forEach(c => c.style.borderColor = '');
+  found.forEach(mw => {
+    const card = document.getElementById('refcard-' + mw.id);
+    if (card) {
+      card.style.borderColor = mw.color;
+      card.style.background = `rgba(${hexToRgb(mw.color)}, 0.06)`;
+    }
+  });
+
+  // Show results
+  document.getElementById('empty-state').style.display = 'none';
+  document.getElementById('results').style.display = 'block';
+}
+
+function hexToRgb(hex) {
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+  return result
+    ? `${parseInt(result[1],16)},${parseInt(result[2],16)},${parseInt(result[3],16)}`
+    : '255,255,255';
+}
+
+// ─────────────────────────────────────────────────────────────
+// UI HELPERS
+// ─────────────────────────────────────────────────────────────
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  btn.classList.add('active');
+}
+
+function clearAll() {
+  document.getElementById('script-input').value = '';
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('empty-state').style.display = 'block';
+  document.querySelectorAll('.ref-card').forEach(c => {
+    c.style.borderColor = '';
+    c.style.background = '';
+  });
+}
+
+function loadDemo() {
+  const context = document.getElementById('context-select').value;
+  const demo = DEMOS[context] || DEMOS.general;
+  document.getElementById('script-input').value = demo;
+  document.getElementById('context-select').value = context === 'wine' ? 'wine' : 'general';
+  analyze();
+}
+
+function copyHighlighted() {
+  const text = document.getElementById('script-input').value;
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = event.target;
+    btn.textContent = 'Copied.';
+    setTimeout(() => btn.textContent = 'Copy Plain Text', 1500);
+  });
+}
+
+// Auto-analyze on Ctrl/Cmd+Enter
+document.addEventListener('keydown', e => {
+  if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') analyze();
+});
+
+// ─────────────────────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────────────────────
+buildRefCards();
+</script>
+</body>
+</html>
