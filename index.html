@@ -4,27 +4,25 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PMJ Analyzer — Exactly What to Say</title>
-  <!-- File parsing libraries (loaded from CDN, works offline too after first load) -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <style>
-    /* ─── Reset & Base ─────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg:        #0d1117;
-      --surface:   #161b22;
-      --card:      #1c2230;
-      --border:    #30363d;
-      --accent:    #c8973a;
-      --accent2:   #e8b96a;
-      --green:     #3fb950;
-      --red:       #f85149;
-      --yellow:    #d29922;
-      --blue:      #58a6ff;
-      --text:      #e6edf3;
-      --muted:     #8b949e;
-      --radius:    10px;
+      --bg:      #0d1117;
+      --surface: #161b22;
+      --card:    #1c2230;
+      --border:  #30363d;
+      --accent:  #c8973a;
+      --accent2: #e8b96a;
+      --green:   #3fb950;
+      --red:     #f85149;
+      --yellow:  #d29922;
+      --blue:    #58a6ff;
+      --text:    #e6edf3;
+      --muted:   #8b949e;
+      --radius:  10px;
     }
 
     body {
@@ -32,130 +30,171 @@
       background: var(--bg);
       color: var(--text);
       min-height: 100vh;
-      padding: 0;
     }
 
-    /* ─── Header ───────────────────────────────────────────── */
+    /* ── Header ── */
     header {
       background: linear-gradient(135deg, #1a1200 0%, #0d1117 60%);
       border-bottom: 1px solid var(--border);
-      padding: 28px 40px 22px;
+      padding: 24px 36px 18px;
       display: flex;
       align-items: center;
-      gap: 20px;
+      gap: 18px;
     }
-
     .logo-badge {
-      width: 52px;
-      height: 52px;
+      width: 50px; height: 50px;
       background: linear-gradient(135deg, var(--accent), #8b5e1a);
       border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 24px;
-      font-weight: 900;
-      color: #fff;
-      flex-shrink: 0;
-      letter-spacing: -1px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; font-weight: 900; color: #fff; flex-shrink: 0;
     }
+    .header-text h1 { font-size: 21px; font-weight: 700; color: var(--accent2); }
+    .header-text p  { font-size: 12px; color: var(--muted); margin-top: 2px; }
 
-    .header-text h1 {
-      font-size: 22px;
-      font-weight: 700;
-      color: var(--accent2);
-      letter-spacing: 0.3px;
-    }
-
-    .header-text p {
-      font-size: 13px;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-
-    /* ─── Layout ───────────────────────────────────────────── */
+    /* ── Layout ── */
     .main {
       display: grid;
-      grid-template-columns: 1fr 380px;
-      gap: 0;
-      height: calc(100vh - 95px);
+      grid-template-columns: 1fr 370px;
+      height: calc(100vh - 90px);
     }
+    .left-pane  { padding: 24px 28px; overflow-y: auto; border-right: 1px solid var(--border); }
+    .right-pane { padding: 20px 18px; overflow-y: auto; background: var(--surface); }
 
-    .left-pane {
-      padding: 28px 32px;
-      overflow-y: auto;
-      border-right: 1px solid var(--border);
+    /* ── Google Drive input ── */
+    .drive-zone {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
     }
-
-    .right-pane {
-      padding: 24px 22px;
-      overflow-y: auto;
-      background: var(--surface);
-    }
-
-    /* ─── Section Labels ───────────────────────────────────── */
-    .section-label {
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 1.2px;
-      color: var(--muted);
-      margin-bottom: 10px;
-    }
-
-    /* ─── Textarea ─────────────────────────────────────────── */
-    .input-wrap {
-      margin-bottom: 22px;
-    }
-
-    .input-wrap label {
-      display: block;
-      font-size: 13px;
-      font-weight: 600;
+    .drive-icon { font-size: 20px; flex-shrink: 0; margin-top: 3px; }
+    .drive-row  { display: flex; gap: 8px; align-items: center; }
+    .drive-input {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 7px;
       color: var(--text);
-      margin-bottom: 8px;
+      font-size: 13px;
+      padding: 7px 11px;
+      outline: none;
+      font-family: inherit;
+      transition: border-color .2s;
     }
-
-    .input-wrap label span {
-      font-weight: 400;
-      color: var(--muted);
+    .drive-input:focus { border-color: var(--accent); }
+    .drive-input::placeholder { color: var(--muted); font-size: 12px; }
+    .btn-drive {
+      padding: 7px 15px;
+      background: #1a73e8;
+      color: #fff;
+      border: none;
+      border-radius: 7px;
       font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn-drive:hover { filter: brightness(1.12); }
+    .btn-drive:disabled { opacity: 0.5; cursor: not-allowed; }
+    .drive-hint { font-size: 11px; color: var(--muted); margin-top: 5px; }
+
+    /* ── File upload zone ── */
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      background: var(--card);
+    }
+    .upload-zone:hover { border-color: var(--accent); background: rgba(200,151,58,.06); }
+    /* File input is hidden — triggered programmatically via zone click */
+    #file-input { display: none; }
+    .upload-icon { font-size: 22px; flex-shrink: 0; }
+    .upload-text { flex: 1; }
+    .upload-text strong { display: block; font-size: 13px; color: var(--text); font-weight: 600; }
+    .upload-text span   { font-size: 11px; color: var(--muted); }
+    .upload-badge {
+      display: inline-block;
+      padding: 1px 7px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      background: rgba(200,151,58,.15);
+      color: var(--accent2);
+      border: 1px solid rgba(200,151,58,.3);
+      margin-right: 3px;
     }
 
+    /* ── Status bars ── */
+    .file-status {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 12px;
+      background: rgba(63,185,80,.1);
+      border: 1px solid rgba(63,185,80,.3);
+      border-radius: 7px;
+      font-size: 12px;
+      color: var(--green);
+      margin-bottom: 12px;
+    }
+    .file-status.show { display: flex; }
+    .file-name { font-weight: 600; }
+    .clear-file { margin-left: auto; cursor: pointer; color: var(--muted); font-size: 14px; }
+    .clear-file:hover { color: var(--red); }
+
+    .spinner-wrap {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      padding: 7px 12px;
+      margin-bottom: 12px;
+    }
+    .spinner-wrap.show { display: flex; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      width: 13px; height: 13px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+
+    /* ── Textarea ── */
+    .input-label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 7px; display: block; }
+    .input-label span { font-weight: 400; color: var(--muted); font-size: 12px; }
     textarea#script-input {
       width: 100%;
-      min-height: 220px;
+      min-height: 190px;
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
       color: var(--text);
       font-size: 14px;
       line-height: 1.65;
-      padding: 14px 16px;
+      padding: 12px 14px;
       resize: vertical;
       outline: none;
-      transition: border-color .2s;
       font-family: inherit;
+      transition: border-color .2s;
+      margin-bottom: 14px;
     }
+    textarea#script-input:focus { border-color: var(--accent); }
+    textarea#script-input::placeholder { color: var(--muted); font-size: 12px; line-height: 1.7; }
 
-    textarea#script-input:focus {
-      border-color: var(--accent);
-    }
-
-    textarea#script-input::placeholder {
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.7;
-    }
-
-    /* ─── Toolbar ──────────────────────────────────────────── */
-    .toolbar {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 26px;
-      flex-wrap: wrap;
-    }
-
+    /* ── Toolbar ── */
+    .toolbar { display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; }
     .btn {
       padding: 9px 20px;
       border-radius: 7px;
@@ -164,26 +203,13 @@
       cursor: pointer;
       border: none;
       transition: all .15s;
-      letter-spacing: 0.2px;
     }
-
-    .btn-primary {
-      background: linear-gradient(135deg, var(--accent), #a87820);
-      color: #fff;
-    }
-
-    .btn-primary:hover { filter: brightness(1.12); }
-
-    .btn-ghost {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--muted);
-    }
-
+    .btn-primary { background: linear-gradient(135deg, var(--accent), #a87820); color: #fff; }
+    .btn-primary:hover { filter: brightness(1.1); }
+    .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--muted); }
     .btn-ghost:hover { border-color: var(--accent); color: var(--text); }
-
     .context-select {
-      padding: 9px 14px;
+      padding: 9px 12px;
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: 7px;
@@ -192,572 +218,139 @@
       outline: none;
       cursor: pointer;
       flex: 1;
-      min-width: 180px;
+      min-width: 170px;
     }
 
-    /* ─── Score Ring ───────────────────────────────────────── */
+    /* ── Score block ── */
     .score-block {
       display: flex;
       align-items: center;
-      gap: 24px;
+      gap: 22px;
       background: var(--card);
       border: 1px solid var(--border);
       border-radius: var(--radius);
-      padding: 20px 24px;
-      margin-bottom: 22px;
+      padding: 18px 22px;
+      margin-bottom: 18px;
     }
-
-    .score-ring {
-      position: relative;
-      width: 90px;
-      height: 90px;
-      flex-shrink: 0;
-    }
-
-    .score-ring svg {
-      transform: rotate(-90deg);
-    }
-
-    .score-ring .ring-bg {
-      fill: none;
-      stroke: var(--border);
-      stroke-width: 8;
-    }
-
-    .score-ring .ring-fill {
-      fill: none;
-      stroke-width: 8;
-      stroke-linecap: round;
-      transition: stroke-dasharray 0.8s cubic-bezier(.4,0,.2,1), stroke .3s;
-    }
-
+    .score-ring { position: relative; width: 88px; height: 88px; flex-shrink: 0; }
+    .score-ring svg { transform: rotate(-90deg); }
+    .ring-bg   { fill: none; stroke: var(--border); stroke-width: 8; }
+    .ring-fill { fill: none; stroke-width: 8; stroke-linecap: round; transition: stroke-dasharray .8s cubic-bezier(.4,0,.2,1), stroke .3s; }
     .score-number {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      font-size: 22px;
-      font-weight: 800;
-      color: var(--text);
-      line-height: 1;
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      font-size: 21px; font-weight: 800; line-height: 1;
     }
-
-    .score-number small {
-      font-size: 10px;
-      font-weight: 400;
-      color: var(--muted);
-      margin-top: 2px;
-    }
-
-    .score-meta h2 {
-      font-size: 18px;
-      font-weight: 700;
-    }
-
-    .score-meta p {
-      font-size: 13px;
-      color: var(--muted);
-      margin-top: 4px;
-      line-height: 1.5;
-    }
-
+    .score-number small { font-size: 10px; font-weight: 400; color: var(--muted); margin-top: 2px; }
+    .score-meta h2 { font-size: 17px; font-weight: 700; }
+    .score-meta p  { font-size: 13px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
     .grade-pill {
       display: inline-block;
-      padding: 3px 12px;
+      padding: 3px 11px;
       border-radius: 20px;
-      font-size: 12px;
-      font-weight: 700;
-      margin-top: 8px;
-    }
-
-    /* ─── Metrics Row ──────────────────────────────────────── */
-    .metrics-row {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 12px;
-      margin-bottom: 22px;
-    }
-
-    .metric-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 14px 16px;
-      text-align: center;
-    }
-
-    .metric-card .metric-val {
-      font-size: 26px;
-      font-weight: 800;
-      line-height: 1;
-    }
-
-    .metric-card .metric-label {
       font-size: 11px;
-      color: var(--muted);
-      margin-top: 5px;
-      text-transform: uppercase;
-      letter-spacing: 0.8px;
-    }
-
-    /* ─── Detected / Missing Tags ──────────────────────────── */
-    .tag-section {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px 18px;
-      margin-bottom: 16px;
-    }
-
-    .tag-section h3 {
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 12px;
-      display: flex;
-      align-items: center;
-      gap: 7px;
-    }
-
-    .tag-section h3 .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-
-    .tag-cloud {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 7px;
-    }
-
-    .tag {
-      padding: 4px 11px;
-      border-radius: 20px;
-      font-size: 12px;
-      font-weight: 500;
-      border: 1px solid;
-    }
-
-    .tag-found {
-      background: rgba(63,185,80,.12);
-      border-color: rgba(63,185,80,.35);
-      color: var(--green);
-    }
-
-    .tag-missing {
-      background: rgba(248,81,73,.08);
-      border-color: rgba(248,81,73,.25);
-      color: var(--red);
-    }
-
-    /* ─── Highlighted Output ───────────────────────────────── */
-    .highlight-box {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px 18px;
-      margin-bottom: 22px;
-    }
-
-    .highlight-box h3 {
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 12px;
-      color: var(--muted);
-    }
-
-    #highlighted-output {
-      font-size: 14px;
-      line-height: 1.75;
-      color: var(--text);
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-
-    mark {
-      padding: 1px 4px;
-      border-radius: 4px;
-      font-weight: 600;
-    }
-
-    /* ─── Suggestions ──────────────────────────────────────── */
-    .suggestion-list {
-      list-style: none;
-    }
-
-    .suggestion-list li {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-left: 3px solid var(--accent);
-      border-radius: 0 var(--radius) var(--radius) 0;
-      padding: 12px 14px;
-      margin-bottom: 10px;
-      font-size: 13px;
-      line-height: 1.6;
-    }
-
-    .suggestion-list li .sug-label {
-      font-size: 10px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: var(--accent);
       font-weight: 700;
-      margin-bottom: 4px;
+      margin-top: 7px;
     }
 
-    /* ─── Right Pane: Reference Cards ─────────────────────── */
-    .ref-card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 12px 14px;
-      margin-bottom: 10px;
-      cursor: pointer;
-      transition: border-color .15s;
-    }
+    /* ── Metrics row ── */
+    .metrics-row { display: grid; grid-template-columns: repeat(3,1fr); gap: 10px; margin-bottom: 18px; }
+    .metric-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 12px 14px; text-align: center; }
+    .metric-val   { font-size: 24px; font-weight: 800; line-height: 1; }
+    .metric-label { font-size: 10px; color: var(--muted); margin-top: 4px; text-transform: uppercase; letter-spacing: .7px; }
 
-    .ref-card:hover { border-color: var(--accent); }
+    /* ── Pillar bars ── */
+    .section-label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1.2px; color: var(--muted); margin-bottom: 10px; }
+    .pillar-scores { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+    .pillar-row    { display: flex; align-items: center; gap: 12px; }
+    .pillar-name   { font-size: 12px; font-weight: 600; width: 88px; flex-shrink: 0; }
+    .pillar-bar-wrap { flex: 1; height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+    .pillar-bar-fill { height: 100%; border-radius: 4px; transition: width .8s cubic-bezier(.4,0,.2,1); }
+    .pillar-pct    { font-size: 12px; font-weight: 700; width: 34px; text-align: right; flex-shrink: 0; }
 
-    .ref-card.active { border-color: var(--accent); background: rgba(200,151,58,.07); }
-
-    .ref-card .ref-number {
-      font-size: 10px;
-      font-weight: 700;
-      color: var(--accent);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .ref-card .ref-phrase {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text);
-      margin-top: 3px;
-    }
-
-    .ref-card .ref-why {
-      font-size: 12px;
-      color: var(--muted);
-      margin-top: 5px;
-      line-height: 1.5;
-    }
-
-    .ref-card .ref-example {
-      font-size: 12px;
-      color: var(--blue);
-      font-style: italic;
-      margin-top: 6px;
-      border-left: 2px solid var(--blue);
-      padding-left: 8px;
-      line-height: 1.5;
-      display: none;
-    }
-
-    .ref-card.active .ref-example { display: block; }
-
-    .ref-pillar {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 18px;
-    }
-
-    .pillar-badge {
-      flex: 1;
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 12px 10px;
-      text-align: center;
-    }
-
-    .pillar-badge .pillar-icon { font-size: 22px; }
-    .pillar-badge .pillar-name { font-size: 11px; font-weight: 700; color: var(--accent2); margin-top: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
-    .pillar-badge .pillar-desc { font-size: 11px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
-
-    /* ─── Tabs ─────────────────────────────────────────────── */
-    .tab-bar {
-      display: flex;
-      gap: 4px;
-      margin-bottom: 18px;
-      border-bottom: 1px solid var(--border);
-    }
-
+    /* ── Tabs ── */
+    .tab-bar { display: flex; gap: 4px; margin-bottom: 16px; border-bottom: 1px solid var(--border); }
     .tab-btn {
-      padding: 8px 16px;
-      font-size: 12px;
-      font-weight: 600;
+      padding: 7px 15px;
+      font-size: 12px; font-weight: 600;
       color: var(--muted);
-      background: none;
-      border: none;
+      background: none; border: none;
       cursor: pointer;
       border-bottom: 2px solid transparent;
       margin-bottom: -1px;
       transition: color .15s, border-color .15s;
     }
-
     .tab-btn.active { color: var(--accent2); border-bottom-color: var(--accent); }
-    .tab-btn:hover { color: var(--text); }
-
-    .tab-panel { display: none; }
+    .tab-btn:hover  { color: var(--text); }
+    .tab-panel      { display: none; }
     .tab-panel.active { display: block; }
 
-    /* ─── Empty State ──────────────────────────────────────── */
-    .empty-state {
-      text-align: center;
-      padding: 40px 20px;
-      color: var(--muted);
-    }
+    /* ── Tag clouds ── */
+    .tag-section { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 14px; }
+    .tag-section h3 { font-size: 13px; font-weight: 600; margin-bottom: 10px; display: flex; align-items: center; gap: 7px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .tag-cloud { display: flex; flex-wrap: wrap; gap: 7px; }
+    .tag { padding: 3px 10px; border-radius: 20px; font-size: 12px; font-weight: 500; border: 1px solid; }
+    .tag-found   { background: rgba(63,185,80,.12);  border-color: rgba(63,185,80,.35);  color: var(--green); }
+    .tag-missing { background: rgba(248,81,73,.08);  border-color: rgba(248,81,73,.25);  color: var(--red); }
 
-    .empty-state .big-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.5; }
-    .empty-state p { font-size: 13px; line-height: 1.7; }
-
-    /* ─── Copy Button ──────────────────────────────────────── */
-    .copy-line {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 8px;
-    }
-
-    .btn-sm {
-      padding: 5px 12px;
-      font-size: 11px;
-      border-radius: 5px;
-      border: 1px solid var(--border);
-      background: transparent;
-      color: var(--muted);
-      cursor: pointer;
-    }
-
+    /* ── Highlighted output ── */
+    .highlight-box { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 18px; }
+    .copy-line { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+    .highlight-box h3 { font-size: 12px; color: var(--muted); font-weight: 600; }
+    #highlighted-output { font-size: 14px; line-height: 1.75; white-space: pre-wrap; word-break: break-word; }
+    mark { padding: 1px 4px; border-radius: 4px; font-weight: 600; background: rgba(200,151,58,.28); color: #e8b96a; }
+    .btn-sm { padding: 4px 11px; font-size: 11px; border-radius: 5px; border: 1px solid var(--border); background: transparent; color: var(--muted); cursor: pointer; }
     .btn-sm:hover { border-color: var(--accent); color: var(--text); }
 
-    /* ─── Pillar Scores ────────────────────────────────────── */
-    .pillar-scores {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-bottom: 22px;
-    }
-
-    .pillar-score-row {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .pillar-score-name {
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text);
-      width: 90px;
-      flex-shrink: 0;
-    }
-
-    .pillar-bar-wrap {
-      flex: 1;
-      height: 8px;
-      background: var(--border);
-      border-radius: 4px;
-      overflow: hidden;
-    }
-
-    .pillar-bar-fill {
-      height: 100%;
-      border-radius: 4px;
-      transition: width 0.8s cubic-bezier(.4,0,.2,1);
-    }
-
-    .pillar-score-pct {
-      font-size: 12px;
-      font-weight: 700;
-      width: 36px;
-      text-align: right;
-      flex-shrink: 0;
-    }
-
-    /* ─── Google Drive Input ───────────────────────────────── */
-    .drive-zone {
+    /* ── Suggestions ── */
+    .suggestion-list { list-style: none; }
+    .suggestion-list li {
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 14px 18px;
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .drive-icon {
-      font-size: 22px;
-      flex-shrink: 0;
-    }
-
-    .drive-input-wrap {
-      flex: 1;
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .drive-input {
-      flex: 1;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 7px;
-      color: var(--text);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      padding: 11px 13px;
+      margin-bottom: 9px;
       font-size: 13px;
-      padding: 8px 12px;
-      outline: none;
-      font-family: inherit;
-      transition: border-color .2s;
+      line-height: 1.6;
     }
+    .sug-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); font-weight: 700; margin-bottom: 4px; }
 
-    .drive-input:focus { border-color: var(--accent); }
-    .drive-input::placeholder { color: var(--muted); font-size: 12px; }
+    /* ── Empty state ── */
+    .empty-state { text-align: center; padding: 36px 20px; color: var(--muted); }
+    .empty-state .big-icon { font-size: 38px; margin-bottom: 10px; opacity: .5; }
+    .empty-state p { font-size: 13px; line-height: 1.7; }
 
-    .btn-drive {
-      padding: 8px 16px;
-      background: #1a73e8;
-      color: #fff;
-      border: none;
-      border-radius: 7px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      flex-shrink: 0;
-      transition: filter .15s;
-    }
+    /* ── Right pane ref cards ── */
+    .ref-pillar { display: flex; gap: 8px; margin-bottom: 16px; }
+    .pillar-badge { flex: 1; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 10px 8px; text-align: center; }
+    .pillar-badge .p-icon { font-size: 20px; }
+    .pillar-badge .p-name { font-size: 10px; font-weight: 700; color: var(--accent2); margin-top: 4px; text-transform: uppercase; }
+    .pillar-badge .p-desc { font-size: 10px; color: var(--muted); margin-top: 2px; line-height: 1.4; }
+    .ref-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 11px 13px; margin-bottom: 8px; cursor: pointer; transition: border-color .15s; }
+    .ref-card:hover { border-color: var(--accent); }
+    .ref-card.active { border-color: var(--accent); }
+    .ref-number  { font-size: 10px; font-weight: 700; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
+    .ref-phrase  { font-size: 13px; font-weight: 600; margin-top: 3px; }
+    .ref-why     { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+    .ref-example { font-size: 12px; color: var(--blue); font-style: italic; margin-top: 6px; border-left: 2px solid var(--blue); padding-left: 8px; line-height: 1.5; display: none; }
+    .ref-card.active .ref-example { display: block; }
 
-    .btn-drive:hover { filter: brightness(1.12); }
-    .btn-drive:disabled { opacity: 0.5; cursor: not-allowed; }
-
-    .drive-hint {
-      font-size: 11px;
-      color: var(--muted);
-      margin-top: 6px;
-    }
-
-    /* ─── File Upload Zone ─────────────────────────────────── */
-    .upload-zone {
-      border: 2px dashed var(--border);
-      border-radius: var(--radius);
-      padding: 18px 20px;
-      margin-bottom: 14px;
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      cursor: pointer;
-      transition: border-color .2s, background .2s;
-      background: var(--card);
-      position: relative;
-    }
-
-    .upload-zone:hover, .upload-zone.drag-over {
-      border-color: var(--accent);
-      background: rgba(200,151,58,.06);
-    }
-
-    .upload-zone input[type="file"] {
-      position: absolute;
-      inset: 0;
-      opacity: 0;
-      cursor: pointer;
-      width: 100%;
-      height: 100%;
-    }
-
-    .upload-icon {
-      font-size: 26px;
-      flex-shrink: 0;
-    }
-
-    .upload-text {
-      flex: 1;
-    }
-
-    .upload-text strong {
-      display: block;
-      font-size: 13px;
-      color: var(--text);
-      font-weight: 600;
-    }
-
-    .upload-text span {
-      font-size: 11px;
-      color: var(--muted);
-    }
-
-    .upload-badge {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 10px;
-      font-weight: 700;
-      background: rgba(200,151,58,.15);
-      color: var(--accent2);
-      border: 1px solid rgba(200,151,58,.3);
-      margin-right: 4px;
-      letter-spacing: 0.3px;
-    }
-
-    .file-status {
-      display: none;
-      align-items: center;
-      gap: 8px;
-      padding: 8px 14px;
-      background: rgba(63,185,80,.1);
-      border: 1px solid rgba(63,185,80,.3);
-      border-radius: 7px;
-      font-size: 12px;
-      color: var(--green);
-      margin-bottom: 14px;
-    }
-
-    .file-status.visible { display: flex; }
-    .file-status .file-name { font-weight: 600; }
-    .file-status .clear-file { margin-left: auto; cursor: pointer; color: var(--muted); font-size: 14px; }
-    .file-status .clear-file:hover { color: var(--red); }
-
-    .parsing-spinner {
-      display: none;
-      align-items: center;
-      gap: 8px;
-      font-size: 12px;
-      color: var(--muted);
-      padding: 8px 14px;
-      margin-bottom: 14px;
-    }
-    .parsing-spinner.visible { display: flex; }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .spinner-dot {
-      width: 14px; height: 14px;
-      border: 2px solid var(--border);
-      border-top-color: var(--accent);
-      border-radius: 50%;
-      animation: spin .7s linear infinite;
-    }
-
-    /* ─── Scrollbar ────────────────────────────────────────── */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
-    /* ─── Responsive ───────────────────────────────────────── */
-    @media (max-width: 900px) {
+    /* ── Responsive ── */
+    @media (max-width: 860px) {
       .main { grid-template-columns: 1fr; height: auto; }
       .right-pane { border-top: 1px solid var(--border); }
-      header { padding: 18px 20px 14px; }
-      .left-pane { padding: 20px 18px; }
     }
   </style>
 </head>
 <body>
 
-<!-- ─── Header ─────────────────────────────────────────────── -->
 <header>
   <div class="logo-badge">PMJ</div>
   <div class="header-text">
@@ -766,35 +359,27 @@
   </div>
 </header>
 
-<!-- ─── Main Layout ─────────────────────────────────────────── -->
 <div class="main">
 
-  <!-- LEFT PANE -->
+  <!-- ════════════ LEFT PANE ════════════ -->
   <div class="left-pane">
 
-    <!-- Google Drive URL input -->
+    <!-- Google Drive -->
     <div class="drive-zone">
       <div class="drive-icon">🔗</div>
       <div style="flex:1">
-        <div class="drive-input-wrap">
-          <input
-            type="url"
-            id="drive-url-input"
-            class="drive-input"
-            placeholder="Paste a Google Drive or Google Docs link — shared with 'Anyone with the link'"
-            onkeydown="if(event.key==='Enter') loadGoogleDrive()"
-          />
+        <div class="drive-row">
+          <input type="url" id="drive-input" class="drive-input"
+            placeholder="Paste a Google Docs or Drive link — 'Anyone with the link' sharing required" />
           <button class="btn-drive" id="drive-btn" onclick="loadGoogleDrive()">Load</button>
         </div>
-        <div class="drive-hint">Supports Google Docs, and Drive-hosted PDF, DOCX, and TXT files</div>
+        <div class="drive-hint">Supports Google Docs, Drive-hosted PDF, DOCX, and TXT files</div>
       </div>
     </div>
 
-    <!-- File Upload Zone -->
-    <div class="upload-zone" id="upload-zone">
-      <input type="file" id="file-input"
-        accept=".txt,.pdf,.doc,.docx,.md,.markdown,.rtf"
-        onchange="handleFileSelect(event)" />
+    <!-- File upload -->
+    <div class="upload-zone" id="upload-zone" onclick="document.getElementById('file-input').click()">
+      <input type="file" id="file-input" accept=".txt,.pdf,.doc,.docx,.md,.markdown,.rtf" />
       <div class="upload-icon">📄</div>
       <div class="upload-text">
         <strong>Drop a file here or click to browse</strong>
@@ -809,23 +394,24 @@
       </div>
     </div>
 
-    <!-- Parsing spinner -->
-    <div class="parsing-spinner" id="parsing-spinner">
-      <div class="spinner-dot"></div>
-      <span id="parsing-msg">Reading file...</span>
+    <!-- Spinner -->
+    <div class="spinner-wrap" id="spinner-wrap">
+      <div class="spinner"></div>
+      <span id="spinner-msg">Reading file...</span>
     </div>
 
-    <!-- File loaded status -->
+    <!-- File loaded -->
     <div class="file-status" id="file-status">
       <span>File loaded:</span>
       <span class="file-name" id="file-name-label"></span>
-      <span class="clear-file" title="Clear file" onclick="clearFile()">✕</span>
+      <span class="clear-file" onclick="clearFile()">✕</span>
     </div>
 
-    <!-- Input -->
-    <div class="input-wrap">
-      <label>Paste Your Script, Email, or Conversation <span>— any sales or persuasion text</span></label>
-      <textarea id="script-input" placeholder="Examples:
+    <!-- Textarea -->
+    <label class="input-label" for="script-input">
+      Paste Your Script, Email, or Conversation <span>— or use a file/link above</span>
+    </label>
+    <textarea id="script-input" placeholder="Examples:
 
 • 'I'm not sure if it's for you, but we have an exclusive wine club tier opening this month...'
 
@@ -833,8 +419,7 @@
 
 • 'Hi, I wanted to talk to you about our event packages. We have a lot of great options...'
 
-Paste anything — a sales email, a follow-up call script, a pitch, or even a text message."></textarea>
-    </div>
+Paste anything — a sales email, a follow-up script, a pitch, or a text message."></textarea>
 
     <!-- Toolbar -->
     <div class="toolbar">
@@ -846,20 +431,19 @@ Paste anything — a sales email, a follow-up call script, a pitch, or even a te
         <option value="followup">Context: Follow-Up / Nurture</option>
         <option value="objection">Context: Handling Objections</option>
       </select>
-      <button class="btn btn-ghost" onclick="clearAll()">Clear</button>
       <button class="btn btn-ghost" onclick="loadDemo()">Load Demo</button>
+      <button class="btn btn-ghost" onclick="clearAll()">Clear</button>
     </div>
 
-    <!-- Results Area (hidden until analysis) -->
+    <!-- Results (hidden until analysis) -->
     <div id="results" style="display:none">
 
-      <!-- Score Block -->
+      <!-- Score -->
       <div class="score-block">
         <div class="score-ring">
-          <svg width="90" height="90" viewBox="0 0 90 90">
-            <circle class="ring-bg" cx="45" cy="45" r="36"/>
-            <circle class="ring-fill" id="ring-fill" cx="45" cy="45" r="36"
-              stroke-dasharray="0 226" stroke-dashoffset="0"/>
+          <svg width="88" height="88" viewBox="0 0 88 88">
+            <circle class="ring-bg" cx="44" cy="44" r="36"/>
+            <circle class="ring-fill" id="ring-fill" cx="44" cy="44" r="36" stroke-dasharray="0 226"/>
           </svg>
           <div class="score-number">
             <span id="score-number">0</span>
@@ -867,13 +451,13 @@ Paste anything — a sales email, a follow-up call script, a pitch, or even a te
           </div>
         </div>
         <div class="score-meta">
-          <h2 id="score-headline">Analyzing...</h2>
+          <h2 id="score-headline">—</h2>
           <p id="score-desc">—</p>
           <div id="grade-pill" class="grade-pill"></div>
         </div>
       </div>
 
-      <!-- Metrics Row -->
+      <!-- Metrics -->
       <div class="metrics-row">
         <div class="metric-card">
           <div class="metric-val" id="m-found" style="color:var(--green)">0</div>
@@ -889,947 +473,659 @@ Paste anything — a sales email, a follow-up call script, a pitch, or even a te
         </div>
       </div>
 
-      <!-- Pillar Scores -->
+      <!-- Pillar bars -->
       <div class="section-label">Three Pillars Score</div>
-      <div class="pillar-scores" style="margin-bottom:22px">
-        <div class="pillar-score-row">
-          <div class="pillar-score-name">Curiosity</div>
-          <div class="pillar-bar-wrap"><div class="pillar-bar-fill" id="pillar-curiosity" style="background:var(--blue);width:0%"></div></div>
-          <div class="pillar-score-pct" id="pct-curiosity" style="color:var(--blue)">0%</div>
+      <div class="pillar-scores">
+        <div class="pillar-row">
+          <div class="pillar-name">Curiosity</div>
+          <div class="pillar-bar-wrap"><div class="pillar-bar-fill" id="bar-curiosity" style="background:var(--blue);width:0%"></div></div>
+          <div class="pillar-pct" id="pct-curiosity" style="color:var(--blue)">0%</div>
         </div>
-        <div class="pillar-score-row">
-          <div class="pillar-score-name">Empathy</div>
-          <div class="pillar-bar-wrap"><div class="pillar-bar-fill" id="pillar-empathy" style="background:var(--green);width:0%"></div></div>
-          <div class="pillar-score-pct" id="pct-empathy" style="color:var(--green)">0%</div>
+        <div class="pillar-row">
+          <div class="pillar-name">Empathy</div>
+          <div class="pillar-bar-wrap"><div class="pillar-bar-fill" id="bar-empathy" style="background:var(--green);width:0%"></div></div>
+          <div class="pillar-pct" id="pct-empathy" style="color:var(--green)">0%</div>
         </div>
-        <div class="pillar-score-row">
-          <div class="pillar-score-name">Courage</div>
-          <div class="pillar-bar-wrap"><div class="pillar-bar-fill" id="pillar-courage" style="background:var(--accent);width:0%"></div></div>
-          <div class="pillar-score-pct" id="pct-courage" style="color:var(--accent)">0%</div>
+        <div class="pillar-row">
+          <div class="pillar-name">Courage</div>
+          <div class="pillar-bar-wrap"><div class="pillar-bar-fill" id="bar-courage" style="background:var(--accent);width:0%"></div></div>
+          <div class="pillar-pct" id="pct-courage" style="color:var(--accent)">0%</div>
         </div>
       </div>
 
       <!-- Tabs -->
       <div class="tab-bar">
-        <button class="tab-btn active" onclick="switchTab('detected',this)">Detected</button>
-        <button class="tab-btn" onclick="switchTab('missing',this)">Missing</button>
-        <button class="tab-btn" onclick="switchTab('highlighted',this)">Highlighted Text</button>
-        <button class="tab-btn" onclick="switchTab('suggestions',this)">Suggestions</button>
+        <button class="tab-btn active" onclick="switchTab('detected', this)">Detected</button>
+        <button class="tab-btn" onclick="switchTab('missing', this)">Missing</button>
+        <button class="tab-btn" onclick="switchTab('highlighted', this)">Highlighted Text</button>
+        <button class="tab-btn" onclick="switchTab('suggestions', this)">Suggestions</button>
       </div>
 
-      <!-- Tab: Detected -->
       <div class="tab-panel active" id="tab-detected">
         <div class="tag-section">
           <h3><span class="dot" style="background:var(--green)"></span>Magic Words Detected</h3>
           <div class="tag-cloud" id="tags-found"></div>
         </div>
       </div>
-
-      <!-- Tab: Missing -->
       <div class="tab-panel" id="tab-missing">
         <div class="tag-section">
           <h3><span class="dot" style="background:var(--red)"></span>Phrases You Could Add</h3>
           <div class="tag-cloud" id="tags-missing"></div>
         </div>
       </div>
-
-      <!-- Tab: Highlighted -->
       <div class="tab-panel" id="tab-highlighted">
         <div class="highlight-box">
           <div class="copy-line">
             <h3>Your Text with Magic Words Highlighted</h3>
-            <button class="btn-sm" onclick="copyHighlighted()">Copy Plain Text</button>
+            <button class="btn-sm" onclick="copyText()">Copy Text</button>
           </div>
           <div id="highlighted-output"></div>
         </div>
       </div>
-
-      <!-- Tab: Suggestions -->
       <div class="tab-panel" id="tab-suggestions">
-        <div class="section-label" style="margin-bottom:12px">Contextual Rewrites</div>
+        <div class="section-label" style="margin-bottom:10px">Contextual Rewrites</div>
         <ul class="suggestion-list" id="suggestion-list"></ul>
       </div>
 
     </div><!-- /results -->
 
-    <!-- Empty state -->
     <div id="empty-state" class="empty-state">
       <div class="big-icon">✍</div>
-      <p>Paste any sales script, email, or follow-up message above.<br>
+      <p>Paste a sales script, drop a file, or load a Google Drive link above.<br>
       The analyzer scores it against Phil M. Jones' 23 Magic Words<br>
-      and Phil's three pillars: <strong>Curiosity, Empathy, and Courage.</strong></p>
+      and his three pillars: <strong>Curiosity, Empathy, and Courage.</strong></p>
     </div>
 
   </div><!-- /left-pane -->
 
-  <!-- RIGHT PANE: Reference Library -->
+  <!-- ════════════ RIGHT PANE ════════════ -->
   <div class="right-pane">
-    <div class="section-label" style="margin-bottom:14px">PMJ Framework Reference</div>
+    <div class="section-label" style="margin-bottom:12px">PMJ Framework Reference</div>
 
-    <!-- Three Pillars -->
     <div class="ref-pillar">
       <div class="pillar-badge">
-        <div class="pillar-icon">🔍</div>
-        <div class="pillar-name">Curiosity</div>
-        <div class="pillar-desc">Ask before you tell. Diagnose first.</div>
+        <div class="p-icon">🔍</div>
+        <div class="p-name">Curiosity</div>
+        <div class="p-desc">Ask before you tell.</div>
       </div>
       <div class="pillar-badge">
-        <div class="pillar-icon">💡</div>
-        <div class="pillar-name">Empathy</div>
-        <div class="pillar-desc">Respond to what they actually need.</div>
+        <div class="p-icon">💡</div>
+        <div class="p-name">Empathy</div>
+        <div class="p-desc">Respond to real needs.</div>
       </div>
       <div class="pillar-badge">
-        <div class="pillar-icon">🦁</div>
-        <div class="pillar-name">Courage</div>
-        <div class="pillar-desc">Ask the hard question. Guide forward.</div>
+        <div class="p-icon">🦁</div>
+        <div class="p-name">Courage</div>
+        <div class="p-desc">Ask the hard question.</div>
       </div>
     </div>
 
-    <div class="section-label" style="margin-bottom:10px">The 23 Magic Words — tap to expand</div>
+    <div class="section-label" style="margin-bottom:8px">The 23 Magic Words — tap to expand</div>
     <div id="ref-cards"></div>
   </div>
 
 </div><!-- /main -->
 
 <script>
-// ─────────────────────────────────────────────────────────────
-// PMJ MAGIC WORDS DATABASE
-// ─────────────────────────────────────────────────────────────
-const MAGIC_WORDS = [
-  {
-    id: 1, phrase: "I'm not sure if it's for you, but",
-    triggers: ["not sure if it", "not sure if this is for you", "might not be for you"],
-    why: "Removes pressure — the word 'but' negates everything before it, triggering curiosity.",
-    example: "I'm not sure if it's for you, but we have one membership spot opening this month.",
-    pillar: "curiosity", color: "#58a6ff"
-  },
-  {
-    id: 2, phrase: "How open-minded are you",
-    triggers: ["open-minded", "open minded", "be open to", "would you be open"],
-    why: "90%+ of people self-identify as open-minded. Saying no means calling yourself closed.",
-    example: "How open-minded would you be about exploring a venue upgrade for your event?",
-    pillar: "curiosity", color: "#58a6ff"
-  },
-  {
-    id: 3, phrase: "What do you know about",
-    triggers: ["what do you know about", "what do you know of"],
-    why: "Socratic method. Forces them to reveal the basis of their opinion — often exposing uncertainty.",
-    example: "What do you know about the new tier we added to the wine club this season?",
-    pillar: "curiosity", color: "#58a6ff"
-  },
-  {
-    id: 4, phrase: "How would you feel if",
-    triggers: ["how would you feel", "how do you feel if", "what would it feel like"],
-    why: "People decide emotionally first, then logically. Loss aversion activates when they imagine missing out.",
-    example: "How would you feel if your event sold out before you locked in your venue?",
-    pillar: "empathy", color: "#3fb950"
-  },
-  {
-    id: 5, phrase: "Just imagine",
-    triggers: ["just imagine", "imagine how", "picture this", "picture yourself"],
-    why: "Paints a vivid mental picture. The subconscious cannot distinguish imagination from reality.",
-    example: "Just imagine how your guests will feel arriving at Dover Hall in October.",
-    pillar: "curiosity", color: "#58a6ff"
-  },
-  {
-    id: 6, phrase: "When would be a good time",
-    triggers: ["when would be a good time", "when's a good time", "what time works", "when works for you", "best time"],
-    why: "Presupposes a yes. Framing a next step as a scheduling question removes the option to say no.",
-    example: "When would be a good time to do a quick walk-through of the property?",
-    pillar: "courage", color: "#c8973a"
-  },
-  {
-    id: 7, phrase: "I'm guessing you haven't got around to",
-    triggers: ["guessing you haven't", "guessing you have not", "i imagine you haven't", "probably haven't had a chance"],
-    why: "Names the excuse before they use it. They either correct you (good) or commit (better).",
-    example: "I'm guessing you haven't got around to reviewing our wine club options yet?",
-    pillar: "courage", color: "#c8973a"
-  },
-  {
-    id: 8, phrase: "What questions do you have for me",
-    triggers: ["what questions do you have", "questions do you have for me", "any questions for me"],
-    why: "Assumes a decision has been made. 'None' is the easy answer — and signals readiness to move forward.",
-    example: "What questions do you have for me before we get started?",
-    pillar: "courage", color: "#c8973a"
-  },
-  {
-    id: 9, phrase: "you have three options",
-    triggers: ["three options", "three choices", "3 options", "a few options", "couple of options"],
-    why: "Three options prevent paralysis. Place your preferred option last as the path of least resistance.",
-    example: "As I see it, you have three options for your membership tier this year.",
-    pillar: "courage", color: "#c8973a"
-  },
-  {
-    id: 10, phrase: "two types of people",
-    triggers: ["two types of people", "two kinds of people", "2 types of people"],
-    why: "Instant self-identification. The listener immediately wonders which type they are.",
-    example: "There are two types of people who invest in a wine club — those who see it as a purchase, and those who see it as a lifestyle.",
-    pillar: "curiosity", color: "#58a6ff"
-  },
-  {
-    id: 11, phrase: "I bet you're a bit like me",
-    triggers: ["i bet you're", "bet you're like me", "i think you're like me", "sounds like you"],
-    why: "We trust people who are like us. This phrase builds instant rapport before delivering the key idea.",
-    example: "I bet you're a bit like me — you want the experience to feel personal, not transactional.",
-    pillar: "empathy", color: "#3fb950"
-  },
-  {
-    id: 12, phrase: "if you",
-    triggers: ["if you.*then", "if you decide", "if you're ready", "if you can", "if we can"],
-    why: "Conditional commitment. Creates a logical promise the listener can test and accept.",
-    example: "If you decide to join this month, then I can hold your spot through the holiday season.",
-    pillar: "courage", color: "#c8973a"
-  },
-  {
-    id: 13, phrase: "don't worry",
-    triggers: ["don't worry", "do not worry", "no worries about", "nothing to worry about"],
-    why: "Triggers comfort conditioning from childhood. Defuses stress and builds trust instantly.",
-    example: "Don't worry — I'll walk you through every detail before anything is confirmed.",
-    pillar: "empathy", color: "#3fb950"
-  },
-  {
-    id: 14, phrase: "most people",
-    triggers: ["most people", "most of our members", "most clients", "most guests", "most couples"],
-    why: "Social proof. 'I am most people' — triggers the desire to conform to what others do.",
-    example: "Most people in your situation join at the Royal tier to start.",
-    pillar: "empathy", color: "#3fb950"
-  },
-  {
-    id: 15, phrase: "the good news is",
-    triggers: ["the good news is", "good news is", "great news is", "here's the good news"],
-    why: "Injects positivity and signals a positive turn. Works even when there was no bad news.",
-    example: "The good news is we still have availability for your preferred weekend.",
-    pillar: "empathy", color: "#3fb950"
-  },
-  {
-    id: 16, phrase: "what happens next is",
-    triggers: ["what happens next", "next step is", "here's what happens next", "here's what we do next"],
-    why: "Closes the loop with authority. Don't ask what they want to do — tell them the path.",
-    example: "What happens next is we'll confirm your date, and I'll send the details within the hour.",
-    pillar: "courage", color: "#c8973a"
-  },
-  {
-    id: 17, phrase: "what makes you say that",
-    triggers: ["what makes you say", "why do you say that", "what brings you to that", "what led you to"],
-    why: "Never counter an objection directly. Ask a question instead — shifts control back to you.",
-    example: "What makes you say that the price is a concern right now?",
-    pillar: "curiosity", color: "#58a6ff"
-  },
-  {
-    id: 18, phrase: "before you make your mind up",
-    triggers: ["before you make your mind up", "before you decide", "before making a decision", "before you say no"],
-    why: "Moves someone from 'no' to 'maybe' — which is all you need. You can work with maybe.",
-    example: "Before you make your mind up, can we walk through what's included one more time?",
-    pillar: "courage", color: "#c8973a"
-  },
-  {
-    id: 19, phrase: "if I can, will you",
-    triggers: ["if i can.*will you", "if we can.*will you", "if i.*would you", "if we could.*would you"],
-    why: "Removes the stated barrier by taking ownership of it. Communicates power and intention.",
-    example: "If I can match that for you, will you be ready to confirm today?",
-    pillar: "courage", color: "#c8973a"
-  },
-  {
-    id: 20, phrase: "enough",
-    triggers: ["be enough", "is that enough", "enough for you", "would.*enough"],
-    why: "Focuses the brain on a single metric. Makes decisions feel simple and proportionate.",
-    example: "Would two bottles a month be enough to start?",
-    pillar: "curiosity", color: "#58a6ff"
-  },
-  {
-    id: 21, phrase: "just one more thing",
-    triggers: ["just one more thing", "one more thing", "one last thing", "one final thing"],
-    why: "The Columbo close — adds a gentle, unexpected follow-up that often lands the commitment.",
-    example: "Just one more thing — have you had a chance to see the new cellar space?",
-    pillar: "courage", color: "#c8973a"
-  },
-  {
-    id: 22, phrase: "would you do me a favor",
-    triggers: ["do me a favor", "would you do me a favor", "can i ask you a favor", "ask a favor"],
-    why: "People have a built-in desire to help. A favor request opens the door and lowers resistance.",
-    example: "Would you do me a favor and just take a look at the membership overview before you decide?",
-    pillar: "empathy", color: "#3fb950"
-  },
-  {
-    id: 23, phrase: "just out of curiosity",
-    triggers: ["just out of curiosity", "out of curiosity", "i'm curious", "curious to know"],
-    why: "Low-pressure qualifier that gets the real answer. Takes the weight off the question.",
-    example: "Just out of curiosity — what would make this a yes for you today?",
-    pillar: "curiosity", color: "#58a6ff"
-  }
+// ═══════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════
+
+var MAGIC_WORDS = [
+  { id:1,  phrase:"I'm not sure if it's for you, but",       triggers:["not sure if it","not sure if this is for you","might not be for you"],                                       why:"Removes pressure. The word 'but' negates everything before it, triggering curiosity.",           example:"I'm not sure if it's for you, but we have one membership spot opening this month.",           pillar:"curiosity", color:"#58a6ff" },
+  { id:2,  phrase:"How open-minded are you",                  triggers:["open-minded","open minded","be open to","would you be open"],                                                why:"90% of people self-identify as open-minded. Saying no means calling yourself closed.",             example:"How open-minded would you be about exploring a venue upgrade for your event?",                pillar:"curiosity", color:"#58a6ff" },
+  { id:3,  phrase:"What do you know about",                   triggers:["what do you know about","what do you know of"],                                                             why:"Forces them to reveal the basis of their opinion, often exposing it as unfounded.",               example:"What do you know about the new tier we added to the wine club this season?",                  pillar:"curiosity", color:"#58a6ff" },
+  { id:4,  phrase:"How would you feel if",                    triggers:["how would you feel","how do you feel if","what would it feel like"],                                         why:"People decide emotionally first. Loss aversion activates when they imagine missing out.",          example:"How would you feel if this spot sold before you had a chance to secure it?",                  pillar:"empathy",   color:"#3fb950" },
+  { id:5,  phrase:"Just imagine",                             triggers:["just imagine","imagine how","picture this","picture yourself"],                                              why:"Paints a vivid mental picture. The subconscious cannot distinguish imagination from reality.",     example:"Just imagine how your guests will feel arriving at Dover Hall in October.",                   pillar:"curiosity", color:"#58a6ff" },
+  { id:6,  phrase:"When would be a good time",                triggers:["when would be a good time","when's a good time","what time works","when works for you","best time"],         why:"Presupposes a yes. Framing a next step as scheduling removes the option to say no.",              example:"When would be a good time to do a quick walk-through of the property?",                      pillar:"courage",   color:"#c8973a" },
+  { id:7,  phrase:"I'm guessing you haven't got around to",   triggers:["guessing you haven't","guessing you have not","i imagine you haven't","probably haven't had a chance"],     why:"Names the excuse before they use it. They either correct you or commit.",                         example:"I'm guessing you haven't got around to reviewing the membership options yet?",                pillar:"courage",   color:"#c8973a" },
+  { id:8,  phrase:"What questions do you have for me",        triggers:["what questions do you have","questions do you have for me","any questions for me"],                          why:"Assumes a decision is made. 'None' is the easy answer — signals readiness to move forward.",      example:"What questions do you have for me before we get started?",                                   pillar:"courage",   color:"#c8973a" },
+  { id:9,  phrase:"You have three options",                   triggers:["three options","three choices","3 options","a few options","couple of options"],                             why:"Three options prevent paralysis. Place your preferred option last as path of least resistance.",   example:"As I see it, you have three options for your membership tier this year.",                     pillar:"courage",   color:"#c8973a" },
+  { id:10, phrase:"Two types of people",                      triggers:["two types of people","two kinds of people","2 types of people"],                                            why:"Triggers instant self-identification. The listener immediately wonders which type they are.",      example:"There are two types of people who invest in a wine club — those who treat it as a purchase, and those who see it as a lifestyle.", pillar:"curiosity", color:"#58a6ff" },
+  { id:11, phrase:"I bet you're a bit like me",               triggers:["i bet you're","bet you're like me","i think you're like me","sounds like you"],                             why:"We trust people who are like us. Builds instant rapport before delivering the key idea.",          example:"I bet you're a bit like me — you want the experience to feel personal, not transactional.",  pillar:"empathy",   color:"#3fb950" },
+  { id:12, phrase:"If you... then",                           triggers:["if you decide","if you're ready","if you can","if we can","if i can"],                                      why:"Conditional commitment. Creates a logical promise the listener can test and accept.",               example:"If you decide to join this month, then I can hold your spot through the holiday season.",      pillar:"courage",   color:"#c8973a" },
+  { id:13, phrase:"Don't worry",                              triggers:["don't worry","do not worry","no worries about","nothing to worry about"],                                   why:"Triggers comfort conditioning. Defuses stress and builds trust instantly.",                        example:"Don't worry — I'll walk you through every detail before anything is confirmed.",              pillar:"empathy",   color:"#3fb950" },
+  { id:14, phrase:"Most people",                              triggers:["most people","most of our members","most clients","most guests","most couples"],                             why:"Social proof. 'I am most people' — triggers the desire to conform to what others do.",            example:"Most people in your situation join at the Royal tier to start.",                              pillar:"empathy",   color:"#3fb950" },
+  { id:15, phrase:"The good news is",                         triggers:["the good news is","good news is","great news is","here's the good news"],                                   why:"Injects positivity. Works even more powerfully when there was no bad news preceding it.",          example:"The good news is we still have availability for your preferred weekend.",                     pillar:"empathy",   color:"#3fb950" },
+  { id:16, phrase:"What happens next is",                     triggers:["what happens next","next step is","here's what happens next","here's what we do next"],                     why:"Closes the loop with authority. Don't ask what they want — tell them the path.",                  example:"What happens next is we confirm your date, and I'll send details within the hour.",           pillar:"courage",   color:"#c8973a" },
+  { id:17, phrase:"What makes you say that",                  triggers:["what makes you say","why do you say that","what brings you to that","what led you to"],                     why:"Never counter an objection directly. Ask a question — shifts control back to you.",               example:"What makes you say the price is a concern right now?",                                       pillar:"curiosity", color:"#58a6ff" },
+  { id:18, phrase:"Before you make your mind up",             triggers:["before you make your mind up","before you decide","before making a decision","before you say no"],          why:"Moves someone from 'no' to 'maybe' — which is all you need. You can work with maybe.",           example:"Before you make your mind up, can we walk through what's included one more time?",            pillar:"courage",   color:"#c8973a" },
+  { id:19, phrase:"If I can, will you",                       triggers:["if i can.*will you","if we can.*will you","if i.*would you","if we could.*would you"],                      why:"Removes the stated barrier by taking ownership of it. Communicates power and intention.",          example:"If I can match that for you, will you be ready to confirm today?",                           pillar:"courage",   color:"#c8973a" },
+  { id:20, phrase:"Enough",                                   triggers:["be enough","is that enough","enough for you","would.*enough"],                                              why:"Focuses the brain on one metric. Makes decisions feel simple and proportionate.",                  example:"Would two bottles a month be enough to start?",                                              pillar:"curiosity", color:"#58a6ff" },
+  { id:21, phrase:"Just one more thing",                      triggers:["just one more thing","one more thing","one last thing","one final thing"],                                  why:"The Columbo close — adds a gentle unexpected follow-up that often lands the commitment.",          example:"Just one more thing — have you had a chance to see the new cellar space?",                   pillar:"courage",   color:"#c8973a" },
+  { id:22, phrase:"Would you do me a favor",                  triggers:["do me a favor","would you do me a favor","can i ask you a favor","ask a favor"],                           why:"People have a built-in desire to help. A favor request opens the door and lowers resistance.",    example:"Would you do me a favor and look at the membership overview before you decide?",              pillar:"empathy",   color:"#3fb950" },
+  { id:23, phrase:"Just out of curiosity",                    triggers:["just out of curiosity","out of curiosity","i'm curious","curious to know"],                                 why:"Low-pressure qualifier that gets the real answer. Takes the weight off the question.",             example:"Just out of curiosity — what would make this a yes for you today?",                          pillar:"curiosity", color:"#58a6ff" }
 ];
 
-// ─────────────────────────────────────────────────────────────
-// DEMO SCRIPTS
-// ─────────────────────────────────────────────────────────────
-const DEMOS = {
-  general: `Hi Sarah, I just wanted to reach out and follow up on our last conversation about the membership program.
-
-We have some great options available and I think you would really like what we offer. Do you have any questions? Let me know if you want to chat this week.
-
-We also have a promotion going on right now that I think you would be interested in. Let me know what you think.
-
-Thanks for your time.`,
-
-  wine: `Good morning Sarah, this is Robert from 7 Lady Vineyards.
-
-I'm not sure if it's for you, but we have one spot opening in our Monarch tier this month and I would hate for you to miss it.
-
-Just imagine receiving a curated selection at your door four times a year, plus access to private release events.
-
-Most of our Monarch members tell us it's the best decision they made — the value and the experience are unlike anything else in the region.
-
-When would be a good time to walk through what's included? What questions do you have for me?`,
+var DEMOS = {
+  general: "Hi Sarah, I just wanted to reach out and follow up on our last conversation about the membership program.\n\nWe have some great options available and I think you would really like what we offer. Do you have any questions? Let me know if you want to chat this week.\n\nWe also have a promotion going on right now that I think you would be interested in. Let me know what you think.\n\nThanks for your time.",
+  wine:    "Good morning Sarah, this is Robert from 7 Lady Vineyards.\n\nI'm not sure if it's for you, but we have one spot opening in our Monarch tier this month and I would hate for you to miss it.\n\nJust imagine receiving a curated selection at your door four times a year, plus access to private release events.\n\nMost of our Monarch members tell us it's the best decision they made. When would be a good time to walk through what's included? What questions do you have for me?"
 };
 
-// ─────────────────────────────────────────────────────────────
-// CONTEXT-SPECIFIC SUGGESTIONS
-// ─────────────────────────────────────────────────────────────
-const CONTEXT_SUGGESTIONS = {
+var CONTEXT_SUGGESTIONS = {
   general: [
-    { label: "Replace weak close", weak: "Let me know what you think", strong: "When would be a good time to talk through the details?" },
-    { label: "Replace passive follow-up", weak: "I think you would really like", strong: "I'm not sure if it's for you, but most people in your situation love what they find." },
-    { label: "Replace permission request", weak: "Do you have any questions?", strong: "What questions do you have for me?" },
+    { label:"Replace weak close",        weak:"Let me know what you think",       strong:"When would be a good time to talk through the details?" },
+    { label:"Replace passive follow-up", weak:"I think you would really like it", strong:"I'm not sure if it's for you, but most people in your situation love what they find." },
+    { label:"Replace permission ask",    weak:"Do you have any questions?",        strong:"What questions do you have for me?" }
   ],
   wine: [
-    { label: "Add loss aversion", weak: "", strong: "How would you feel if this tier sold out before you had a chance to try it?" },
-    { label: "Add social proof", weak: "", strong: "Most of our members tell us the first shipment is when they realize the real value." },
-    { label: "Add conditional commitment", weak: "", strong: "If I can hold your spot until Friday, will you be ready to confirm?" },
+    { label:"Add loss aversion",         weak:"", strong:"How would you feel if this tier sold out before you had a chance to try it?" },
+    { label:"Add social proof",          weak:"", strong:"Most of our members tell us the first shipment is when they realize the real value." },
+    { label:"Add conditional commit",    weak:"", strong:"If I can hold your spot until Friday, will you be ready to confirm?" }
   ],
   events: [
-    { label: "Add identity framing", weak: "", strong: "There are two types of hosts: those who book the first available date, and those who secure the right venue for the story they want to tell." },
-    { label: "Add vision language", weak: "", strong: "Just imagine your guests arriving at dusk with the vineyard lit for dinner." },
-    { label: "Add Columbo close", weak: "", strong: "Just one more thing — have you seen the new courtyard we finished this spring?" },
+    { label:"Add identity framing",      weak:"", strong:"There are two types of hosts: those who book the first available date, and those who secure the right venue for the story they want to tell." },
+    { label:"Add vision language",       weak:"", strong:"Just imagine your guests arriving at dusk with the vineyard lit for dinner." },
+    { label:"Add Columbo close",         weak:"", strong:"Just one more thing — have you seen the new courtyard we finished this spring?" }
   ],
   followup: [
-    { label: "Disarm the excuse early", weak: "I'm following up", strong: "I'm guessing you haven't got around to reviewing the proposal yet?" },
-    { label: "Re-open the door", weak: "Let me know if you're interested", strong: "Before you make your mind up, can we walk through one more detail?" },
-    { label: "Low-pressure qualifier", weak: "Are you still interested?", strong: "Just out of curiosity — what would make this a yes for you?" },
+    { label:"Disarm the excuse early",   weak:"I'm following up",                 strong:"I'm guessing you haven't got around to reviewing the proposal yet?" },
+    { label:"Re-open the door",          weak:"Let me know if you're interested",  strong:"Before you make your mind up, can we walk through one more detail?" },
+    { label:"Low-pressure qualifier",    weak:"Are you still interested?",         strong:"Just out of curiosity — what would make this a yes for you?" }
   ],
   objection: [
-    { label: "Never counter directly", weak: "That's not actually the case", strong: "What makes you say that?" },
-    { label: "Remove the stated barrier", weak: "I understand, but...", strong: "If I can take that off the table entirely, will you be ready to move forward?" },
-    { label: "Move from no to maybe", weak: "I hope you'll reconsider", strong: "Before you make your mind up, let's just run through what you'd be saying no to." },
-  ],
+    { label:"Never counter directly",    weak:"That's not actually the case",      strong:"What makes you say that?" },
+    { label:"Remove the barrier",        weak:"I understand, but...",              strong:"If I can take that off the table entirely, will you be ready to move forward?" },
+    { label:"Move from no to maybe",     weak:"I hope you'll reconsider",          strong:"Before you make your mind up, let's just run through what you'd be saying no to." }
+  ]
 };
 
-// ─────────────────────────────────────────────────────────────
-// FILE UPLOAD & PARSING ENGINE
-// ─────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// REFERENCE CARDS
+// ═══════════════════════════════════════════════════════════════
 
-// Set pdf.js worker
-if (typeof pdfjsLib !== 'undefined') {
-  pdfjsLib.GlobalWorkerOptions.workerSrc =
-    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-}
-
-// Drag-and-drop support on the upload zone
-const uploadZone = document.getElementById('upload-zone');
-
-uploadZone.addEventListener('dragover', e => {
-  e.preventDefault();
-  uploadZone.classList.add('drag-over');
-});
-
-uploadZone.addEventListener('dragleave', () => {
-  uploadZone.classList.remove('drag-over');
-});
-
-uploadZone.addEventListener('drop', e => {
-  e.preventDefault();
-  uploadZone.classList.remove('drag-over');
-  const file = e.dataTransfer.files[0];
-  if (file) processFile(file);
-});
-
-function handleFileSelect(event) {
-  const file = event.target.files[0];
-  if (file) processFile(file);
-}
-
-function showSpinner(msg) {
-  document.getElementById('parsing-spinner').classList.add('visible');
-  document.getElementById('parsing-msg').textContent = msg || 'Reading file...';
-  document.getElementById('file-status').classList.remove('visible');
-}
-
-function hideSpinner() {
-  document.getElementById('parsing-spinner').classList.remove('visible');
-}
-
-function showFileLoaded(name) {
-  hideSpinner();
-  document.getElementById('file-name-label').textContent = name;
-  document.getElementById('file-status').classList.add('visible');
-}
-
-function processFile(file) {
-  const name = file.name;
-  const ext = name.split('.').pop().toLowerCase();
-
-  showSpinner('Reading ' + name + '...');
-
-  if (ext === 'txt' || ext === 'md' || ext === 'markdown') {
-    parsePlainText(file, name);
-  } else if (ext === 'pdf') {
-    parsePDF(file, name);
-  } else if (ext === 'docx') {
-    parseDOCX(file, name);
-  } else if (ext === 'doc') {
-    parseDocLegacy(file, name);
-  } else if (ext === 'rtf') {
-    parseRTF(file, name);
-  } else {
-    hideSpinner();
-    alert('Unsupported file type. Please use TXT, PDF, DOCX, DOC, MD, or RTF.');
-  }
-}
-
-// ── .txt / .md / .markdown ──────────────────────────────────
-function parsePlainText(file, name) {
-  const reader = new FileReader();
-  reader.onload = e => {
-    let text = e.target.result;
-    // Strip markdown syntax for cleaner analysis
-    text = stripMarkdown(text);
-    setTextareaAndAnalyze(text, name);
-  };
-  reader.onerror = () => { hideSpinner(); alert('Could not read the file.'); };
-  reader.readAsText(file);
-}
-
-function stripMarkdown(text) {
-  return text
-    .replace(/#{1,6}\s+/g, '')         // headings
-    .replace(/\*\*([^*]+)\*\*/g, '$1') // bold
-    .replace(/\*([^*]+)\*/g, '$1')     // italic
-    .replace(/__([^_]+)__/g, '$1')     // bold alt
-    .replace(/_([^_]+)_/g, '$1')       // italic alt
-    .replace(/~~([^~]+)~~/g, '$1')     // strikethrough
-    .replace(/`{1,3}[^`]*`{1,3}/g, '') // inline code
-    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // links
-    .replace(/^[-*+]\s+/gm, '')        // list bullets
-    .replace(/^\d+\.\s+/gm, '')        // numbered lists
-    .replace(/^>\s+/gm, '')            // blockquotes
-    .replace(/---+/g, '')              // horizontal rules
-    .trim();
-}
-
-// ── .pdf ────────────────────────────────────────────────────
-async function parsePDF(file, name) {
-  if (typeof pdfjsLib === 'undefined') {
-    hideSpinner();
-    alert('PDF library is still loading. Please check your internet connection and try again.');
-    return;
-  }
-  try {
-    const arrayBuffer = await file.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-    let fullText = '';
-    for (let i = 1; i <= pdf.numPages; i++) {
-      const page = await pdf.getPage(i);
-      const content = await page.getTextContent();
-      const pageText = content.items.map(item => item.str).join(' ');
-      fullText += pageText + '\n';
-    }
-    if (!fullText.trim()) {
-      hideSpinner();
-      alert('This PDF appears to be image-based (scanned). The analyzer needs selectable text.');
-      return;
-    }
-    setTextareaAndAnalyze(fullText.trim(), name);
-  } catch (err) {
-    hideSpinner();
-    alert('Could not read this PDF. It may be encrypted or corrupted.\n\nError: ' + err.message);
-  }
-}
-
-// ── .docx ───────────────────────────────────────────────────
-async function parseDOCX(file, name) {
-  if (typeof mammoth === 'undefined') {
-    hideSpinner();
-    alert('Word document library is still loading. Please try again in a moment.');
-    return;
-  }
-  try {
-    const arrayBuffer = await file.arrayBuffer();
-    const result = await mammoth.extractRawText({ arrayBuffer });
-    if (!result.value.trim()) {
-      hideSpinner();
-      alert('The Word document appears to be empty.');
-      return;
-    }
-    setTextareaAndAnalyze(result.value.trim(), name);
-  } catch (err) {
-    hideSpinner();
-    alert('Could not read this Word document.\n\nError: ' + err.message);
-  }
-}
-
-// ── .doc (legacy Word) ──────────────────────────────────────
-function parseDocLegacy(file, name) {
-  // Legacy .doc is binary — extract readable text with a regex pass
-  const reader = new FileReader();
-  reader.onload = e => {
-    try {
-      const binary = e.target.result;
-      // Extract ASCII text sequences from the binary blob
-      let text = '';
-      for (let i = 0; i < binary.length; i++) {
-        const code = binary.charCodeAt(i);
-        if (code >= 32 && code < 127) {
-          text += binary[i];
-        } else if (code === 13 || code === 10) {
-          text += ' ';
-        }
-      }
-      // Clean up junk characters — keep runs of 4+ printable chars
-      const cleaned = text.match(/[A-Za-z0-9 ,.'"\-!?;:()\r\n]{4,}/g) || [];
-      const finalText = cleaned.join(' ').replace(/\s{2,}/g, ' ').trim();
-      if (!finalText) {
-        hideSpinner();
-        alert('Could not extract text from this .doc file. Try saving it as .docx from Microsoft Word and re-uploading.');
-        return;
-      }
-      setTextareaAndAnalyze(finalText, name);
-    } catch (err) {
-      hideSpinner();
-      alert('Could not read this .doc file. Try saving as .docx and re-uploading.');
-    }
-  };
-  reader.readAsBinaryString(file);
-}
-
-// ── .rtf ───────────────────────────────────────────────────
-function parseRTF(file, name) {
-  const reader = new FileReader();
-  reader.onload = e => {
-    try {
-      let rtf = e.target.result;
-      // Strip RTF control codes
-      let text = rtf
-        .replace(/\{\\[^}]*\}/g, '')         // remove groups
-        .replace(/\\[a-z]+\d*\s?/gi, ' ')    // remove control words
-        .replace(/[{}\\]/g, ' ')              // remove braces and backslashes
-        .replace(/\s{2,}/g, ' ')
-        .trim();
-      if (!text) {
-        hideSpinner();
-        alert('Could not extract text from this RTF file.');
-        return;
-      }
-      setTextareaAndAnalyze(text, name);
-    } catch (err) {
-      hideSpinner();
-      alert('Could not read this RTF file.\n\nError: ' + err.message);
-    }
-  };
-  reader.onerror = () => { hideSpinner(); alert('Could not read the file.'); };
-  reader.readAsText(file);
-}
-
-// ── Shared: set textarea and run analysis ──────────────────
-function setTextareaAndAnalyze(text, filename) {
-  const textarea = document.getElementById('script-input');
-  textarea.value = text;
-  showFileLoaded(filename);
-  // Small delay so the UI updates before analysis runs
-  setTimeout(() => analyze(), 80);
-}
-
-function clearFile() {
-  document.getElementById('file-status').classList.remove('visible');
-  document.getElementById('file-input').value = '';
-}
-
-// ─────────────────────────────────────────────────────────────
-// GOOGLE DRIVE / GOOGLE DOCS LOADER
-// ─────────────────────────────────────────────────────────────
-
-function extractDriveId(url) {
-  // Handles all common Google Drive / Docs URL formats:
-  // https://docs.google.com/document/d/FILE_ID/edit
-  // https://docs.google.com/document/d/FILE_ID/view
-  // https://drive.google.com/file/d/FILE_ID/view
-  // https://drive.google.com/open?id=FILE_ID
-  // https://drive.google.com/uc?id=FILE_ID
-  const patterns = [
-    /\/d\/([a-zA-Z0-9_-]{25,})/,          // /d/FILE_ID
-    /[?&]id=([a-zA-Z0-9_-]{25,})/,        // ?id=FILE_ID or &id=FILE_ID
-  ];
-  for (const rx of patterns) {
-    const m = url.match(rx);
-    if (m) return m[1];
-  }
-  return null;
-}
-
-function getDriveFileType(url) {
-  if (url.includes('docs.google.com/document')) return 'gdoc';
-  if (url.includes('docs.google.com/spreadsheets')) return 'gsheet';
-  if (url.includes('docs.google.com/presentation')) return 'gslides';
-  return 'file'; // generic Drive file — could be PDF, DOCX, TXT
-}
-
-async function loadGoogleDrive() {
-  const input = document.getElementById('drive-url-input');
-  const btn = document.getElementById('drive-btn');
-  const url = input.value.trim();
-
-  if (!url) {
-    alert('Please paste a Google Drive or Google Docs link first.');
-    return;
-  }
-
-  const fileId = extractDriveId(url);
-  if (!fileId) {
-    alert('Could not find a valid Google Drive file ID in that link.\n\nMake sure you copied the full link from the Share dialog.');
-    return;
-  }
-
-  const fileType = getDriveFileType(url);
-  btn.disabled = true;
-  btn.textContent = 'Loading...';
-  showSpinner('Fetching from Google Drive...');
-
-  try {
-    if (fileType === 'gdoc') {
-      await fetchGoogleDoc(fileId, url);
-    } else {
-      // Generic Drive file — try fetching directly
-      await fetchDriveFile(fileId);
-    }
-  } catch (err) {
-    hideSpinner();
-    showDriveError(err.message);
-  } finally {
-    btn.disabled = false;
-    btn.textContent = 'Load';
-  }
-}
-
-async function fetchGoogleDoc(fileId, originalUrl) {
-  // Google Docs: export as plain text via the public export URL
-  // This works as long as the document is shared "Anyone with the link"
-  const exportUrl = `https://docs.google.com/document/d/${fileId}/export?format=txt`;
-
-  const response = await fetchWithCorsProxy(exportUrl);
-
-  if (!response.ok) {
-    if (response.status === 401 || response.status === 403) {
-      throw new Error(
-        'Access denied (403).\n\nMake sure the document is set to "Anyone with the link can view" in Google Docs Share settings.\n\n' +
-        'In Google Docs: Share → Change to "Anyone with the link" → Copy link.'
-      );
-    }
-    if (response.status === 404) {
-      throw new Error('Document not found (404). Check that the link is correct.');
-    }
-    throw new Error(`Google returned an error: HTTP ${response.status}`);
-  }
-
-  const text = await response.text();
-  if (!text.trim()) {
-    throw new Error('The Google Doc appears to be empty.');
-  }
-
-  const docName = 'Google Doc (' + fileId.slice(0, 8) + '...)';
-  setTextareaAndAnalyze(text.trim(), docName);
-}
-
-async function fetchDriveFile(fileId) {
-  // For non-Docs Drive files (PDF, DOCX, TXT)
-  // Use the direct download URL
-  const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
-  const response = await fetchWithCorsProxy(downloadUrl);
-
-  if (!response.ok) {
-    if (response.status === 403) {
-      throw new Error(
-        'Access denied.\n\nMake sure the file is shared as "Anyone with the link can view".'
-      );
-    }
-    throw new Error(`Could not fetch the file: HTTP ${response.status}`);
-  }
-
-  const contentType = response.headers.get('content-type') || '';
-  const blob = await response.blob();
-
-  // Detect file type from content-type
-  if (contentType.includes('pdf')) {
-    const file = new File([blob], 'drive-file.pdf', { type: 'application/pdf' });
-    await parsePDF(file, 'Google Drive PDF');
-  } else if (
-    contentType.includes('officedocument.wordprocessingml') ||
-    contentType.includes('docx')
-  ) {
-    const file = new File([blob], 'drive-file.docx', { type: blob.type });
-    await parseDOCX(file, 'Google Drive DOCX');
-  } else if (contentType.includes('text/plain')) {
-    const text = await blob.text();
-    setTextareaAndAnalyze(text.trim(), 'Google Drive Text File');
-  } else if (contentType.includes('text/html')) {
-    // Google sometimes returns an HTML warning page for large files
-    const html = await blob.text();
-    if (html.includes('virus scan') || html.includes('download anyway')) {
-      throw new Error(
-        'Google Drive is showing a virus-scan warning for this file (it\'s too large for direct export).\n\n' +
-        'Download the file manually and use the file upload zone instead.'
-      );
-    }
-    // Strip HTML tags and use the text
-    const text = html.replace(/<[^>]+>/g, ' ').replace(/\s{2,}/g, ' ').trim();
-    setTextareaAndAnalyze(text, 'Google Drive File');
-  } else {
-    // Last resort: try reading as plain text
-    const text = await blob.text();
-    if (text.trim().length > 10) {
-      setTextareaAndAnalyze(text.trim(), 'Google Drive File');
-    } else {
-      throw new Error(
-        'Could not determine the file type (' + contentType + ').\n\n' +
-        'For best results, share Google Docs as a Google Doc (not a PDF or DOCX stored in Drive).'
-      );
-    }
-  }
-}
-
-async function fetchWithCorsProxy(url) {
-  // Try the direct request first (works when CORS allows it)
-  try {
-    const direct = await fetch(url, { mode: 'cors' });
-    return direct;
-  } catch (corsErr) {
-    // Fall back to a public CORS proxy
-    const proxy = 'https://corsproxy.io/?' + encodeURIComponent(url);
-    return fetch(proxy);
-  }
-}
-
-function showDriveError(msg) {
-  alert('Google Drive Error\n\n' + msg);
-}
-
-// ─────────────────────────────────────────────────────────────
-// BUILD REFERENCE CARDS
-// ─────────────────────────────────────────────────────────────
 function buildRefCards() {
-  const container = document.getElementById('ref-cards');
-  container.innerHTML = MAGIC_WORDS.map((mw, i) => `
-    <div class="ref-card" id="refcard-${mw.id}" onclick="toggleRefCard(${mw.id})">
-      <div class="ref-number">Word ${mw.id} of 23 · ${mw.pillar.charAt(0).toUpperCase()+mw.pillar.slice(1)}</div>
-      <div class="ref-phrase" style="color:${mw.color}">"${mw.phrase}..."</div>
-      <div class="ref-why">${mw.why}</div>
-      <div class="ref-example">Example: "${mw.example}"</div>
-    </div>
-  `).join('');
+  var html = '';
+  for (var i = 0; i < MAGIC_WORDS.length; i++) {
+    var mw = MAGIC_WORDS[i];
+    var cap = mw.pillar.charAt(0).toUpperCase() + mw.pillar.slice(1);
+    html += '<div class="ref-card" id="rc-' + mw.id + '" onclick="toggleRef(' + mw.id + ')">';
+    html += '<div class="ref-number">Word ' + mw.id + ' of 23 &middot; ' + cap + '</div>';
+    html += '<div class="ref-phrase" style="color:' + mw.color + '">&ldquo;' + mw.phrase + '&hellip;&rdquo;</div>';
+    html += '<div class="ref-why">' + mw.why + '</div>';
+    html += '<div class="ref-example">Example: &ldquo;' + mw.example + '&rdquo;</div>';
+    html += '</div>';
+  }
+  document.getElementById('ref-cards').innerHTML = html;
 }
 
-function toggleRefCard(id) {
-  const card = document.getElementById('refcard-' + id);
-  card.classList.toggle('active');
+function toggleRef(id) {
+  var card = document.getElementById('rc-' + id);
+  if (card) card.classList.toggle('active');
 }
 
-// ─────────────────────────────────────────────────────────────
-// CORE ANALYSIS ENGINE
-// ─────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// ANALYZE
+// ═══════════════════════════════════════════════════════════════
+
 function analyze() {
-  const text = document.getElementById('script-input').value.trim();
+  try {
+    var text = document.getElementById('script-input').value.trim();
   if (!text) {
-    alert("Please paste a script or message to analyze.");
+    alert('Please paste a script or load a file first.');
     return;
   }
 
-  const lower = text.toLowerCase();
-  const wordCount = text.split(/\s+/).filter(Boolean).length;
-  const context = document.getElementById('context-select').value;
+  var lower    = text.toLowerCase();
+  var words    = text.split(/\s+/).filter(function(w){ return w.length > 0; });
+  var wordCount = words.length;
+  var context  = document.getElementById('context-select').value;
 
-  // Detect magic words
-  const found = [];
-  const missing = [];
-
-  MAGIC_WORDS.forEach(mw => {
-    const hit = mw.triggers.some(t => {
+  // Detect
+  var found   = [];
+  var missing = [];
+  for (var i = 0; i < MAGIC_WORDS.length; i++) {
+    var mw  = MAGIC_WORDS[i];
+    var hit = false;
+    for (var t = 0; t < mw.triggers.length; t++) {
       try {
-        return new RegExp(t, 'i').test(lower);
+        if (new RegExp(mw.triggers[t], 'i').test(lower)) { hit = true; break; }
       } catch(e) {
-        return lower.includes(t);
+        if (lower.indexOf(mw.triggers[t]) !== -1) { hit = true; break; }
       }
-    });
+    }
     if (hit) found.push(mw);
-    else missing.push(mw);
-  });
+    else     missing.push(mw);
+  }
 
-  // Score calculation
-  const rawScore = Math.round((found.length / MAGIC_WORDS.length) * 100);
-  // Bonus for word count (brevity is good in sales)
-  const lengthBonus = wordCount < 150 ? 5 : wordCount > 500 ? -5 : 0;
-  const score = Math.min(100, Math.max(0, rawScore + lengthBonus));
-
-  // Pillar scoring
-  const pillars = { curiosity: 0, empathy: 0, courage: 0 };
-  const pillarTotals = { curiosity: 0, empathy: 0, courage: 0 };
-  MAGIC_WORDS.forEach(mw => { pillarTotals[mw.pillar]++; });
-  found.forEach(mw => { pillars[mw.pillar]++; });
-
-  const pCuriosity = Math.round((pillars.curiosity / pillarTotals.curiosity) * 100);
-  const pEmpathy = Math.round((pillars.empathy / pillarTotals.empathy) * 100);
-  const pCourage = Math.round((pillars.courage / pillarTotals.courage) * 100);
-
-  // Grade
-  let grade, headline, desc, gradeColor;
-  if (score >= 80) { grade = "A"; headline = "High-Influence Script"; desc = "This language is well-calibrated for persuasion. Multiple magic words working together."; gradeColor = "rgba(63,185,80,.2); color:var(--green)"; }
-  else if (score >= 60) { grade = "B"; headline = "Solid Foundation"; desc = "Good use of influence language. A few more magic words would close the gap."; gradeColor = "rgba(88,166,255,.15); color:var(--blue)"; }
-  else if (score >= 40) { grade = "C"; headline = "Room to Improve"; desc = "Some magic words present, but the script leans on general language. Rewrites below will help."; gradeColor = "rgba(210,153,34,.2); color:var(--yellow)"; }
-  else if (score >= 20) { grade = "D"; headline = "Weak Persuasion Signal"; desc = "This script relies on generic language. The subconscious brain has nothing to hook onto."; gradeColor = "rgba(248,81,73,.15); color:var(--red)"; }
-  else { grade = "F"; headline = "No Magic Words Detected"; desc = "This is standard filler language. Apply the PMJ framework to make every word count."; gradeColor = "rgba(248,81,73,.15); color:var(--red)"; }
-
-  // Ring color
-  const ringColor = score >= 70 ? "#3fb950" : score >= 40 ? "#d29922" : "#f85149";
-  const circumference = 2 * Math.PI * 36;
-  const dash = (score / 100) * circumference;
-
-  // ─── Render ────────────────────────────────────────────────
-  document.getElementById('score-number').textContent = score;
-  document.getElementById('score-headline').textContent = headline;
-  document.getElementById('score-desc').textContent = desc;
-  document.getElementById('grade-pill').textContent = "Grade: " + grade;
-  document.getElementById('grade-pill').style.cssText = `background:${gradeColor.split(';')[0].replace('rgba','rgba').trim()};color:${gradeColor.split(':')[2].trim()}`;
-  // fix grad pill styling
-  const gp = document.getElementById('grade-pill');
-  const [bg, clr] = gradeColor.split(';');
-  gp.style.background = bg.trim();
-  gp.style.color = clr.replace('color:', '').trim();
-
-  const rf = document.getElementById('ring-fill');
-  rf.style.stroke = ringColor;
-  rf.style.strokeDasharray = `${dash} ${circumference}`;
-
-  document.getElementById('m-found').textContent = found.length;
-  document.getElementById('m-missing').textContent = missing.length;
-  document.getElementById('m-words').textContent = wordCount;
+  // Score
+  var raw    = Math.round((found.length / MAGIC_WORDS.length) * 100);
+  var bonus  = wordCount < 150 ? 5 : wordCount > 500 ? -5 : 0;
+  var score  = Math.min(100, Math.max(0, raw + bonus));
 
   // Pillars
-  document.getElementById('pillar-curiosity').style.width = pCuriosity + '%';
-  document.getElementById('pillar-empathy').style.width = pEmpathy + '%';
-  document.getElementById('pillar-courage').style.width = pCourage + '%';
-  document.getElementById('pct-curiosity').textContent = pCuriosity + '%';
-  document.getElementById('pct-empathy').textContent = pEmpathy + '%';
-  document.getElementById('pct-courage').textContent = pCourage + '%';
+  var counts = { curiosity:0, empathy:0, courage:0 };
+  var totals = { curiosity:0, empathy:0, courage:0 };
+  for (var i = 0; i < MAGIC_WORDS.length; i++) totals[MAGIC_WORDS[i].pillar]++;
+  for (var i = 0; i < found.length; i++)       counts[found[i].pillar]++;
+  var pC = Math.round(counts.curiosity / totals.curiosity * 100);
+  var pE = Math.round(counts.empathy   / totals.empathy   * 100);
+  var pG = Math.round(counts.courage   / totals.courage   * 100);
+
+  // Grade
+  var grade, headline, desc, bgColor, txtColor;
+  if      (score >= 80) { grade="A"; headline="High-Influence Script"; desc="This language is well-calibrated for persuasion. Multiple magic words working together."; bgColor="rgba(63,185,80,.18)";   txtColor="#3fb950"; }
+  else if (score >= 60) { grade="B"; headline="Solid Foundation";      desc="Good use of influence language. A few more magic words would close the gap.";            bgColor="rgba(88,166,255,.15)";  txtColor="#58a6ff"; }
+  else if (score >= 40) { grade="C"; headline="Room to Improve";       desc="Some magic words present, but the script leans on generic language.";                    bgColor="rgba(210,153,34,.18)";  txtColor="#d29922"; }
+  else if (score >= 20) { grade="D"; headline="Weak Persuasion Signal"; desc="This script relies on generic language. The subconscious brain has nothing to hook onto."; bgColor="rgba(248,81,73,.15)"; txtColor="#f85149"; }
+  else                  { grade="F"; headline="No Magic Words Detected"; desc="Standard filler language. Apply the PMJ framework to make every word count.";           bgColor="rgba(248,81,73,.15)";  txtColor="#f85149"; }
+
+  var ringColor = score >= 70 ? "#3fb950" : score >= 40 ? "#d29922" : "#f85149";
+  var circ = 2 * Math.PI * 36;
+  var dash = (score / 100) * circ;
+
+  // ── Render ──
+  document.getElementById('score-number').textContent  = score;
+  document.getElementById('score-headline').textContent = headline;
+  document.getElementById('score-desc').textContent    = desc;
+
+  var gp = document.getElementById('grade-pill');
+  gp.textContent        = 'Grade: ' + grade;
+  gp.style.background   = bgColor;
+  gp.style.color        = txtColor;
+
+  var rf = document.getElementById('ring-fill');
+  rf.style.stroke           = ringColor;
+  rf.style.strokeDasharray  = dash + ' ' + circ;
+
+  document.getElementById('m-found').textContent   = found.length;
+  document.getElementById('m-missing').textContent = missing.length;
+  document.getElementById('m-words').textContent   = wordCount;
+
+  document.getElementById('bar-curiosity').style.width = pC + '%';
+  document.getElementById('bar-empathy').style.width   = pE + '%';
+  document.getElementById('bar-courage').style.width   = pG + '%';
+  document.getElementById('pct-curiosity').textContent = pC + '%';
+  document.getElementById('pct-empathy').textContent   = pE + '%';
+  document.getElementById('pct-courage').textContent   = pG + '%';
 
   // Tags
-  const tagsFound = document.getElementById('tags-found');
-  tagsFound.innerHTML = found.length
-    ? found.map(mw => `<span class="tag tag-found">${mw.phrase}</span>`).join('')
-    : '<span style="color:var(--muted);font-size:13px">None detected</span>';
+  var tf = '';
+  if (found.length) {
+    for (var i = 0; i < found.length; i++) tf += '<span class="tag tag-found">' + found[i].phrase + '</span>';
+  } else {
+    tf = '<span style="color:var(--muted);font-size:13px">None detected</span>';
+  }
+  document.getElementById('tags-found').innerHTML = tf;
 
-  const tagsMissing = document.getElementById('tags-missing');
-  tagsMissing.innerHTML = missing.length
-    ? missing.map(mw => `<span class="tag tag-missing">${mw.phrase}</span>`).join('')
-    : '<span style="color:var(--green);font-size:13px">All magic words present.</span>';
+  var tm = '';
+  if (missing.length) {
+    for (var i = 0; i < missing.length; i++) tm += '<span class="tag tag-missing">' + missing[i].phrase + '</span>';
+  } else {
+    tm = '<span style="color:var(--green);font-size:13px">All magic words present.</span>';
+  }
+  document.getElementById('tags-missing').innerHTML = tm;
 
   // Highlighted text
-  let highlighted = text;
-  found.forEach(mw => {
-    mw.triggers.forEach(t => {
+  var hl = escapeHTML(text);
+  for (var i = 0; i < found.length; i++) {
+    var mw = found[i];
+    for (var t = 0; t < mw.triggers.length; t++) {
       try {
-        const rx = new RegExp(`(${t})`, 'gi');
-        highlighted = highlighted.replace(rx, `<mark style="background:rgba(200,151,58,.25);color:#e8b96a">$1</mark>`);
+        hl = hl.replace(new RegExp('(' + mw.triggers[t] + ')', 'gi'), '<mark>$1</mark>');
       } catch(e) {}
-    });
-  });
-  document.getElementById('highlighted-output').innerHTML = highlighted;
+    }
+  }
+  document.getElementById('highlighted-output').innerHTML = hl;
 
   // Suggestions
-  const suggs = CONTEXT_SUGGESTIONS[context] || CONTEXT_SUGGESTIONS.general;
-  const suggList = document.getElementById('suggestion-list');
-  let items = suggs.map(s => `
-    <li>
-      <div class="sug-label">${s.label}</div>
-      ${s.weak ? `<div style="color:var(--red);font-size:12px;margin-bottom:4px">✗ "${s.weak}"</div>` : ''}
-      <div style="color:var(--green)">✓ "${s.strong}"</div>
-    </li>
-  `);
-  // Add targeted tips based on what's missing
-  if (missing.find(m => m.id === 23)) {
-    items.push(`<li><div class="sug-label">Close stronger</div>Add to your closing: <span style="color:var(--blue)">"Just out of curiosity — what would make this a yes for you today?"</span></li>`);
+  var suggs = CONTEXT_SUGGESTIONS[context] || CONTEXT_SUGGESTIONS.general;
+  var sl = '';
+  for (var i = 0; i < suggs.length; i++) {
+    var s = suggs[i];
+    sl += '<li>';
+    sl += '<div class="sug-label">' + s.label + '</div>';
+    if (s.weak) sl += '<div style="color:var(--red);font-size:12px;margin-bottom:4px">&#x2717; &ldquo;' + s.weak + '&rdquo;</div>';
+    sl += '<div style="color:var(--green)">&#x2713; &ldquo;' + s.strong + '&rdquo;</div>';
+    sl += '</li>';
   }
-  if (missing.find(m => m.id === 4)) {
-    items.push(`<li><div class="sug-label">Add loss aversion</div>Ask: <span style="color:var(--blue)">"How would you feel if this opportunity wasn't available by next week?"</span></li>`);
-  }
-  if (missing.find(m => m.id === 16)) {
-    items.push(`<li><div class="sug-label">Remove decision friction</div>End with: <span style="color:var(--blue)">"What happens next is we'll get your details confirmed and I'll send everything over today."</span></li>`);
-  }
-  suggList.innerHTML = items.join('');
+  // Targeted tips
+  var hasMissing = function(id) { for (var i=0;i<missing.length;i++) if(missing[i].id===id) return true; return false; };
+  if (hasMissing(23)) sl += '<li><div class="sug-label">Close stronger</div><div style="color:var(--blue)">Add: &ldquo;Just out of curiosity &mdash; what would make this a yes for you today?&rdquo;</div></li>';
+  if (hasMissing(4))  sl += '<li><div class="sug-label">Add loss aversion</div><div style="color:var(--blue)">Ask: &ldquo;How would you feel if this opportunity wasn\'t available by next week?&rdquo;</div></li>';
+  if (hasMissing(16)) sl += '<li><div class="sug-label">Remove decision friction</div><div style="color:var(--blue)">End with: &ldquo;What happens next is we\'ll get your details confirmed and I\'ll send everything over today.&rdquo;</div></li>';
+  document.getElementById('suggestion-list').innerHTML = sl;
 
-  // Highlight active ref cards
-  document.querySelectorAll('.ref-card').forEach(c => c.style.borderColor = '');
-  found.forEach(mw => {
-    const card = document.getElementById('refcard-' + mw.id);
+  // Highlight ref cards
+  for (var i = 0; i < MAGIC_WORDS.length; i++) {
+    var card = document.getElementById('rc-' + MAGIC_WORDS[i].id);
+    if (!card) continue;
+    card.style.borderColor = '';
+    card.style.background  = '';
+  }
+  for (var i = 0; i < found.length; i++) {
+    var card = document.getElementById('rc-' + found[i].id);
     if (card) {
-      card.style.borderColor = mw.color;
-      card.style.background = `rgba(${hexToRgb(mw.color)}, 0.06)`;
+      card.style.borderColor = found[i].color;
+      card.style.background  = 'rgba(28,34,48,0.9)';
     }
-  });
+  }
 
-  // Show results
   document.getElementById('empty-state').style.display = 'none';
-  document.getElementById('results').style.display = 'block';
+  document.getElementById('results').style.display     = 'block';
+  } catch(err) {
+    alert('Analyzer error: ' + err.message + '\n\nPlease refresh the page and try again.');
+    console.error(err);
+  }
 }
 
-function hexToRgb(hex) {
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result
-    ? `${parseInt(result[1],16)},${parseInt(result[2],16)},${parseInt(result[3],16)}`
-    : '255,255,255';
+function escapeHTML(str) {
+  return str
+    .replace(/&/g,  '&amp;')
+    .replace(/</g,  '&lt;')
+    .replace(/>/g,  '&gt;')
+    .replace(/"/g,  '&quot;');
 }
 
-// ─────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
 // UI HELPERS
-// ─────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+
 function switchTab(tab, btn) {
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  var panels = document.querySelectorAll('.tab-panel');
+  var btns   = document.querySelectorAll('.tab-btn');
+  for (var i = 0; i < panels.length; i++) panels[i].classList.remove('active');
+  for (var i = 0; i < btns.length; i++)   btns[i].classList.remove('active');
   document.getElementById('tab-' + tab).classList.add('active');
   btn.classList.add('active');
 }
 
 function clearAll() {
-  document.getElementById('script-input').value = '';
-  document.getElementById('results').style.display = 'none';
+  document.getElementById('script-input').value  = '';
+  document.getElementById('results').style.display     = 'none';
   document.getElementById('empty-state').style.display = 'block';
-  document.querySelectorAll('.ref-card').forEach(c => {
-    c.style.borderColor = '';
-    c.style.background = '';
-  });
+  clearFile();
 }
 
 function loadDemo() {
-  const context = document.getElementById('context-select').value;
-  const demo = DEMOS[context] || DEMOS.general;
-  document.getElementById('script-input').value = demo;
-  document.getElementById('context-select').value = context === 'wine' ? 'wine' : 'general';
+  var ctx = document.getElementById('context-select').value;
+  document.getElementById('script-input').value = DEMOS[ctx] || DEMOS.general;
   analyze();
 }
 
-function copyHighlighted() {
-  const text = document.getElementById('script-input').value;
-  navigator.clipboard.writeText(text).then(() => {
-    const btn = event.target;
-    btn.textContent = 'Copied.';
-    setTimeout(() => btn.textContent = 'Copy Plain Text', 1500);
-  });
+function copyText() {
+  var text = document.getElementById('script-input').value;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(function() {
+      var btn = document.querySelector('.btn-sm');
+      btn.textContent = 'Copied.';
+      setTimeout(function(){ btn.textContent = 'Copy Text'; }, 1500);
+    });
+  }
 }
 
-// Auto-analyze on Ctrl/Cmd+Enter
-document.addEventListener('keydown', e => {
+document.addEventListener('keydown', function(e) {
   if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') analyze();
 });
 
-// ─────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
+// FILE UPLOAD
+// ═══════════════════════════════════════════════════════════════
+
+if (typeof pdfjsLib !== 'undefined') {
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+
+// Drag and drop
+var uploadZone = document.getElementById('upload-zone');
+uploadZone.addEventListener('dragover', function(e) {
+  e.preventDefault();
+  uploadZone.style.borderColor = 'var(--accent)';
+  uploadZone.style.background  = 'rgba(200,151,58,.06)';
+});
+uploadZone.addEventListener('dragleave', function() {
+  uploadZone.style.borderColor = '';
+  uploadZone.style.background  = '';
+});
+uploadZone.addEventListener('drop', function(e) {
+  e.preventDefault();
+  uploadZone.style.borderColor = '';
+  uploadZone.style.background  = '';
+  var file = e.dataTransfer.files[0];
+  if (file) handleFileSelect(file);
+});
+
+function handleFileSelect(file) {
+  if (!file) return;
+  var ext = file.name.split('.').pop().toLowerCase();
+  showSpinner('Reading ' + file.name + '...');
+  if (ext === 'txt' || ext === 'md' || ext === 'markdown') parsePlainText(file);
+  else if (ext === 'pdf')  parsePDF(file);
+  else if (ext === 'docx') parseDOCX(file);
+  else if (ext === 'doc')  parseDocLegacy(file);
+  else if (ext === 'rtf')  parseRTF(file);
+  else { hideSpinner(); alert('Unsupported file type. Please use TXT, PDF, DOCX, DOC, MD, or RTF.'); }
+}
+
+function showSpinner(msg) {
+  document.getElementById('spinner-wrap').classList.add('show');
+  document.getElementById('spinner-msg').textContent = msg || 'Reading...';
+  document.getElementById('file-status').classList.remove('show');
+}
+function hideSpinner() {
+  document.getElementById('spinner-wrap').classList.remove('show');
+}
+function showFileLoaded(name) {
+  hideSpinner();
+  document.getElementById('file-name-label').textContent = name;
+  document.getElementById('file-status').classList.add('show');
+}
+function clearFile() {
+  document.getElementById('file-status').classList.remove('show');
+  document.getElementById('file-input').value = '';
+}
+
+function setAndAnalyze(text, name) {
+  document.getElementById('script-input').value = text;
+  showFileLoaded(name);
+  setTimeout(analyze, 80);
+}
+
+function parsePlainText(file) {
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var text = e.target.result;
+    text = text
+      .replace(/#{1,6}\s+/g,  '')
+      .replace(/\*\*([^*]+)\*\*/g, '$1')
+      .replace(/\*([^*]+)\*/g, '$1')
+      .replace(/__([^_]+)__/g, '$1')
+      .replace(/_([^_]+)_/g,   '$1')
+      .replace(/~~([^~]+)~~/g, '$1')
+      .replace(/`{1,3}[^`]*`{1,3}/g, '')
+      .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+      .replace(/^[-*+]\s+/gm,  '')
+      .replace(/^\d+\.\s+/gm,  '')
+      .replace(/^>\s+/gm,      '')
+      .replace(/---+/g,        '')
+      .trim();
+    setAndAnalyze(text, file.name);
+  };
+  reader.onerror = function() { hideSpinner(); alert('Could not read the file.'); };
+  reader.readAsText(file);
+}
+
+function parsePDF(file) {
+  if (typeof pdfjsLib === 'undefined') { hideSpinner(); alert('PDF library is loading. Try again in a moment.'); return; }
+  file.arrayBuffer().then(function(buf) {
+    return pdfjsLib.getDocument({ data: buf }).promise;
+  }).then(function(pdf) {
+    var pagePromises = [];
+    for (var i = 1; i <= pdf.numPages; i++) {
+      pagePromises.push(pdf.getPage(i).then(function(page) {
+        return page.getTextContent().then(function(c) {
+          return c.items.map(function(it){ return it.str; }).join(' ');
+        });
+      }));
+    }
+    return Promise.all(pagePromises);
+  }).then(function(pages) {
+    var text = pages.join('\n').trim();
+    if (!text) { hideSpinner(); alert('This PDF has no selectable text (it may be a scanned image).'); return; }
+    setAndAnalyze(text, file.name);
+  }).catch(function(err) {
+    hideSpinner(); alert('Could not read PDF: ' + err.message);
+  });
+}
+
+function parseDOCX(file) {
+  if (typeof mammoth === 'undefined') { hideSpinner(); alert('Word library is loading. Try again in a moment.'); return; }
+  file.arrayBuffer().then(function(buf) {
+    return mammoth.extractRawText({ arrayBuffer: buf });
+  }).then(function(result) {
+    if (!result.value.trim()) { hideSpinner(); alert('The Word document appears to be empty.'); return; }
+    setAndAnalyze(result.value.trim(), file.name);
+  }).catch(function(err) {
+    hideSpinner(); alert('Could not read Word document: ' + err.message);
+  });
+}
+
+function parseDocLegacy(file) {
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var binary  = e.target.result;
+    var text    = '';
+    for (var i = 0; i < binary.length; i++) {
+      var code = binary.charCodeAt(i);
+      if (code >= 32 && code < 127) text += binary[i];
+      else if (code === 13 || code === 10) text += ' ';
+    }
+    var cleaned = text.match(/[A-Za-z0-9 ,.'"\-!?;:()\r\n]{4,}/g) || [];
+    var final   = cleaned.join(' ').replace(/\s{2,}/g, ' ').trim();
+    if (!final) { hideSpinner(); alert('Could not extract text from .doc. Try saving as .docx and re-uploading.'); return; }
+    setAndAnalyze(final, file.name);
+  };
+  reader.onerror = function() { hideSpinner(); alert('Could not read the file.'); };
+  reader.readAsBinaryString(file);
+}
+
+function parseRTF(file) {
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var text = e.target.result
+      .replace(/\{\\[^}]*\}/g,     '')
+      .replace(/\\[a-z]+\d*\s?/gi, ' ')
+      .replace(/[{}\\]/g,          ' ')
+      .replace(/\s{2,}/g,          ' ')
+      .trim();
+    if (!text) { hideSpinner(); alert('Could not extract text from RTF file.'); return; }
+    setAndAnalyze(text, file.name);
+  };
+  reader.onerror = function() { hideSpinner(); alert('Could not read the file.'); };
+  reader.readAsText(file);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// GOOGLE DRIVE
+// ═══════════════════════════════════════════════════════════════
+
+function extractDriveId(url) {
+  var patterns = [
+    /\/d\/([a-zA-Z0-9_-]{25,})/,
+    /[?&]id=([a-zA-Z0-9_-]{25,})/
+  ];
+  for (var i = 0; i < patterns.length; i++) {
+    var m = url.match(patterns[i]);
+    if (m) return m[1];
+  }
+  return null;
+}
+
+function loadGoogleDrive() {
+  var input = document.getElementById('drive-input');
+  var btn   = document.getElementById('drive-btn');
+  var url   = input.value.trim();
+
+  if (!url) { alert('Please paste a Google Drive or Google Docs link first.'); return; }
+
+  var fileId = extractDriveId(url);
+  if (!fileId) { alert('Could not find a valid Google Drive file ID in that link.\n\nCopy the full link from the Share dialog.'); return; }
+
+  btn.disabled    = true;
+  btn.textContent = 'Loading...';
+  showSpinner('Fetching from Google Drive...');
+
+  var isDoc = url.indexOf('docs.google.com/document') !== -1;
+
+  if (isDoc) {
+    var exportUrl = 'https://docs.google.com/document/d/' + fileId + '/export?format=txt';
+    fetchWithFallback(exportUrl)
+      .then(function(resp) {
+        if (!resp.ok) throw new Error('HTTP ' + resp.status + '. Make sure the document is shared as "Anyone with the link can view".');
+        return resp.text();
+      })
+      .then(function(text) {
+        if (!text.trim()) throw new Error('The Google Doc appears to be empty.');
+        setAndAnalyze(text.trim(), 'Google Doc');
+      })
+      .catch(function(err) {
+        hideSpinner();
+        alert('Google Drive Error\n\n' + err.message);
+      })
+      .finally(function() {
+        btn.disabled    = false;
+        btn.textContent = 'Load';
+      });
+  } else {
+    var downloadUrl = 'https://drive.google.com/uc?export=download&id=' + fileId;
+    fetchWithFallback(downloadUrl)
+      .then(function(resp) {
+        if (!resp.ok) throw new Error('HTTP ' + resp.status + '. Make sure the file is shared as "Anyone with the link can view".');
+        var ct = resp.headers.get('content-type') || '';
+        return resp.blob().then(function(blob) { return { blob: blob, ct: ct }; });
+      })
+      .then(function(obj) {
+        var blob = obj.blob;
+        var ct   = obj.ct;
+        if (ct.indexOf('pdf') !== -1) {
+          var f = new File([blob], 'drive.pdf', { type: 'application/pdf' });
+          parsePDF(f);
+        } else if (ct.indexOf('wordprocessingml') !== -1 || ct.indexOf('docx') !== -1) {
+          var f = new File([blob], 'drive.docx', { type: blob.type });
+          parseDOCX(f);
+        } else {
+          blob.text().then(function(text) {
+            if (text.trim().length < 10) throw new Error('Could not extract text from this file type.');
+            setAndAnalyze(text.trim(), 'Google Drive File');
+          });
+        }
+      })
+      .catch(function(err) {
+        hideSpinner();
+        alert('Google Drive Error\n\n' + err.message);
+      })
+      .finally(function() {
+        btn.disabled    = false;
+        btn.textContent = 'Load';
+      });
+  }
+}
+
+function fetchWithFallback(url) {
+  return fetch(url).catch(function() {
+    return fetch('https://corsproxy.io/?' + encodeURIComponent(url));
+  });
+}
+
+// ═══════════════════════════════════════════════════════════════
 // INIT
-// ─────────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════
 buildRefCards();
+
+// Backup button binding (belt-and-suspenders alongside onclick attribute)
+var analyzeBtn = document.querySelector('.btn-primary');
+if (analyzeBtn) {
+  analyzeBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    analyze();
+  });
+}
+
+// File input change event (wired here, not inline, so it cannot conflict)
+document.getElementById('file-input').addEventListener('change', function() {
+  if (this.files && this.files[0]) handleFileSelect(this.files[0]);
+});
 </script>
 </body>
 </html>
