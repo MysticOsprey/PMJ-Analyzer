@@ -4,6 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>PMJ Analyzer — Exactly What to Say</title>
+  <!-- File parsing libraries (loaded from CDN, works offline too after first load) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <style>
     /* ─── Reset & Base ─────────────────────────────────────── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -575,6 +578,169 @@
       flex-shrink: 0;
     }
 
+    /* ─── Google Drive Input ───────────────────────────────── */
+    .drive-zone {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .drive-icon {
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+
+    .drive-input-wrap {
+      flex: 1;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .drive-input {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 7px;
+      color: var(--text);
+      font-size: 13px;
+      padding: 8px 12px;
+      outline: none;
+      font-family: inherit;
+      transition: border-color .2s;
+    }
+
+    .drive-input:focus { border-color: var(--accent); }
+    .drive-input::placeholder { color: var(--muted); font-size: 12px; }
+
+    .btn-drive {
+      padding: 8px 16px;
+      background: #1a73e8;
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: filter .15s;
+    }
+
+    .btn-drive:hover { filter: brightness(1.12); }
+    .btn-drive:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    .drive-hint {
+      font-size: 11px;
+      color: var(--muted);
+      margin-top: 6px;
+    }
+
+    /* ─── File Upload Zone ─────────────────────────────────── */
+    .upload-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+      background: var(--card);
+      position: relative;
+    }
+
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: var(--accent);
+      background: rgba(200,151,58,.06);
+    }
+
+    .upload-zone input[type="file"] {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+    }
+
+    .upload-icon {
+      font-size: 26px;
+      flex-shrink: 0;
+    }
+
+    .upload-text {
+      flex: 1;
+    }
+
+    .upload-text strong {
+      display: block;
+      font-size: 13px;
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .upload-text span {
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    .upload-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      background: rgba(200,151,58,.15);
+      color: var(--accent2);
+      border: 1px solid rgba(200,151,58,.3);
+      margin-right: 4px;
+      letter-spacing: 0.3px;
+    }
+
+    .file-status {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      background: rgba(63,185,80,.1);
+      border: 1px solid rgba(63,185,80,.3);
+      border-radius: 7px;
+      font-size: 12px;
+      color: var(--green);
+      margin-bottom: 14px;
+    }
+
+    .file-status.visible { display: flex; }
+    .file-status .file-name { font-weight: 600; }
+    .file-status .clear-file { margin-left: auto; cursor: pointer; color: var(--muted); font-size: 14px; }
+    .file-status .clear-file:hover { color: var(--red); }
+
+    .parsing-spinner {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      color: var(--muted);
+      padding: 8px 14px;
+      margin-bottom: 14px;
+    }
+    .parsing-spinner.visible { display: flex; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner-dot {
+      width: 14px; height: 14px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+
     /* ─── Scrollbar ────────────────────────────────────────── */
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
@@ -605,6 +771,56 @@
 
   <!-- LEFT PANE -->
   <div class="left-pane">
+
+    <!-- Google Drive URL input -->
+    <div class="drive-zone">
+      <div class="drive-icon">🔗</div>
+      <div style="flex:1">
+        <div class="drive-input-wrap">
+          <input
+            type="url"
+            id="drive-url-input"
+            class="drive-input"
+            placeholder="Paste a Google Drive or Google Docs link — shared with 'Anyone with the link'"
+            onkeydown="if(event.key==='Enter') loadGoogleDrive()"
+          />
+          <button class="btn-drive" id="drive-btn" onclick="loadGoogleDrive()">Load</button>
+        </div>
+        <div class="drive-hint">Supports Google Docs, and Drive-hosted PDF, DOCX, and TXT files</div>
+      </div>
+    </div>
+
+    <!-- File Upload Zone -->
+    <div class="upload-zone" id="upload-zone">
+      <input type="file" id="file-input"
+        accept=".txt,.pdf,.doc,.docx,.md,.markdown,.rtf"
+        onchange="handleFileSelect(event)" />
+      <div class="upload-icon">📄</div>
+      <div class="upload-text">
+        <strong>Drop a file here or click to browse</strong>
+        <span>
+          <span class="upload-badge">TXT</span>
+          <span class="upload-badge">PDF</span>
+          <span class="upload-badge">DOCX</span>
+          <span class="upload-badge">DOC</span>
+          <span class="upload-badge">MD</span>
+          <span class="upload-badge">RTF</span>
+        </span>
+      </div>
+    </div>
+
+    <!-- Parsing spinner -->
+    <div class="parsing-spinner" id="parsing-spinner">
+      <div class="spinner-dot"></div>
+      <span id="parsing-msg">Reading file...</span>
+    </div>
+
+    <!-- File loaded status -->
+    <div class="file-status" id="file-status">
+      <span>File loaded:</span>
+      <span class="file-name" id="file-name-label"></span>
+      <span class="clear-file" title="Clear file" onclick="clearFile()">✕</span>
+    </div>
 
     <!-- Input -->
     <div class="input-wrap">
@@ -996,6 +1212,403 @@ const CONTEXT_SUGGESTIONS = {
     { label: "Move from no to maybe", weak: "I hope you'll reconsider", strong: "Before you make your mind up, let's just run through what you'd be saying no to." },
   ],
 };
+
+// ─────────────────────────────────────────────────────────────
+// FILE UPLOAD & PARSING ENGINE
+// ─────────────────────────────────────────────────────────────
+
+// Set pdf.js worker
+if (typeof pdfjsLib !== 'undefined') {
+  pdfjsLib.GlobalWorkerOptions.workerSrc =
+    'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+}
+
+// Drag-and-drop support on the upload zone
+const uploadZone = document.getElementById('upload-zone');
+
+uploadZone.addEventListener('dragover', e => {
+  e.preventDefault();
+  uploadZone.classList.add('drag-over');
+});
+
+uploadZone.addEventListener('dragleave', () => {
+  uploadZone.classList.remove('drag-over');
+});
+
+uploadZone.addEventListener('drop', e => {
+  e.preventDefault();
+  uploadZone.classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file) processFile(file);
+});
+
+function handleFileSelect(event) {
+  const file = event.target.files[0];
+  if (file) processFile(file);
+}
+
+function showSpinner(msg) {
+  document.getElementById('parsing-spinner').classList.add('visible');
+  document.getElementById('parsing-msg').textContent = msg || 'Reading file...';
+  document.getElementById('file-status').classList.remove('visible');
+}
+
+function hideSpinner() {
+  document.getElementById('parsing-spinner').classList.remove('visible');
+}
+
+function showFileLoaded(name) {
+  hideSpinner();
+  document.getElementById('file-name-label').textContent = name;
+  document.getElementById('file-status').classList.add('visible');
+}
+
+function processFile(file) {
+  const name = file.name;
+  const ext = name.split('.').pop().toLowerCase();
+
+  showSpinner('Reading ' + name + '...');
+
+  if (ext === 'txt' || ext === 'md' || ext === 'markdown') {
+    parsePlainText(file, name);
+  } else if (ext === 'pdf') {
+    parsePDF(file, name);
+  } else if (ext === 'docx') {
+    parseDOCX(file, name);
+  } else if (ext === 'doc') {
+    parseDocLegacy(file, name);
+  } else if (ext === 'rtf') {
+    parseRTF(file, name);
+  } else {
+    hideSpinner();
+    alert('Unsupported file type. Please use TXT, PDF, DOCX, DOC, MD, or RTF.');
+  }
+}
+
+// ── .txt / .md / .markdown ──────────────────────────────────
+function parsePlainText(file, name) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    let text = e.target.result;
+    // Strip markdown syntax for cleaner analysis
+    text = stripMarkdown(text);
+    setTextareaAndAnalyze(text, name);
+  };
+  reader.onerror = () => { hideSpinner(); alert('Could not read the file.'); };
+  reader.readAsText(file);
+}
+
+function stripMarkdown(text) {
+  return text
+    .replace(/#{1,6}\s+/g, '')         // headings
+    .replace(/\*\*([^*]+)\*\*/g, '$1') // bold
+    .replace(/\*([^*]+)\*/g, '$1')     // italic
+    .replace(/__([^_]+)__/g, '$1')     // bold alt
+    .replace(/_([^_]+)_/g, '$1')       // italic alt
+    .replace(/~~([^~]+)~~/g, '$1')     // strikethrough
+    .replace(/`{1,3}[^`]*`{1,3}/g, '') // inline code
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // links
+    .replace(/^[-*+]\s+/gm, '')        // list bullets
+    .replace(/^\d+\.\s+/gm, '')        // numbered lists
+    .replace(/^>\s+/gm, '')            // blockquotes
+    .replace(/---+/g, '')              // horizontal rules
+    .trim();
+}
+
+// ── .pdf ────────────────────────────────────────────────────
+async function parsePDF(file, name) {
+  if (typeof pdfjsLib === 'undefined') {
+    hideSpinner();
+    alert('PDF library is still loading. Please check your internet connection and try again.');
+    return;
+  }
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+    let fullText = '';
+    for (let i = 1; i <= pdf.numPages; i++) {
+      const page = await pdf.getPage(i);
+      const content = await page.getTextContent();
+      const pageText = content.items.map(item => item.str).join(' ');
+      fullText += pageText + '\n';
+    }
+    if (!fullText.trim()) {
+      hideSpinner();
+      alert('This PDF appears to be image-based (scanned). The analyzer needs selectable text.');
+      return;
+    }
+    setTextareaAndAnalyze(fullText.trim(), name);
+  } catch (err) {
+    hideSpinner();
+    alert('Could not read this PDF. It may be encrypted or corrupted.\n\nError: ' + err.message);
+  }
+}
+
+// ── .docx ───────────────────────────────────────────────────
+async function parseDOCX(file, name) {
+  if (typeof mammoth === 'undefined') {
+    hideSpinner();
+    alert('Word document library is still loading. Please try again in a moment.');
+    return;
+  }
+  try {
+    const arrayBuffer = await file.arrayBuffer();
+    const result = await mammoth.extractRawText({ arrayBuffer });
+    if (!result.value.trim()) {
+      hideSpinner();
+      alert('The Word document appears to be empty.');
+      return;
+    }
+    setTextareaAndAnalyze(result.value.trim(), name);
+  } catch (err) {
+    hideSpinner();
+    alert('Could not read this Word document.\n\nError: ' + err.message);
+  }
+}
+
+// ── .doc (legacy Word) ──────────────────────────────────────
+function parseDocLegacy(file, name) {
+  // Legacy .doc is binary — extract readable text with a regex pass
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const binary = e.target.result;
+      // Extract ASCII text sequences from the binary blob
+      let text = '';
+      for (let i = 0; i < binary.length; i++) {
+        const code = binary.charCodeAt(i);
+        if (code >= 32 && code < 127) {
+          text += binary[i];
+        } else if (code === 13 || code === 10) {
+          text += ' ';
+        }
+      }
+      // Clean up junk characters — keep runs of 4+ printable chars
+      const cleaned = text.match(/[A-Za-z0-9 ,.'"\-!?;:()\r\n]{4,}/g) || [];
+      const finalText = cleaned.join(' ').replace(/\s{2,}/g, ' ').trim();
+      if (!finalText) {
+        hideSpinner();
+        alert('Could not extract text from this .doc file. Try saving it as .docx from Microsoft Word and re-uploading.');
+        return;
+      }
+      setTextareaAndAnalyze(finalText, name);
+    } catch (err) {
+      hideSpinner();
+      alert('Could not read this .doc file. Try saving as .docx and re-uploading.');
+    }
+  };
+  reader.readAsBinaryString(file);
+}
+
+// ── .rtf ───────────────────────────────────────────────────
+function parseRTF(file, name) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      let rtf = e.target.result;
+      // Strip RTF control codes
+      let text = rtf
+        .replace(/\{\\[^}]*\}/g, '')         // remove groups
+        .replace(/\\[a-z]+\d*\s?/gi, ' ')    // remove control words
+        .replace(/[{}\\]/g, ' ')              // remove braces and backslashes
+        .replace(/\s{2,}/g, ' ')
+        .trim();
+      if (!text) {
+        hideSpinner();
+        alert('Could not extract text from this RTF file.');
+        return;
+      }
+      setTextareaAndAnalyze(text, name);
+    } catch (err) {
+      hideSpinner();
+      alert('Could not read this RTF file.\n\nError: ' + err.message);
+    }
+  };
+  reader.onerror = () => { hideSpinner(); alert('Could not read the file.'); };
+  reader.readAsText(file);
+}
+
+// ── Shared: set textarea and run analysis ──────────────────
+function setTextareaAndAnalyze(text, filename) {
+  const textarea = document.getElementById('script-input');
+  textarea.value = text;
+  showFileLoaded(filename);
+  // Small delay so the UI updates before analysis runs
+  setTimeout(() => analyze(), 80);
+}
+
+function clearFile() {
+  document.getElementById('file-status').classList.remove('visible');
+  document.getElementById('file-input').value = '';
+}
+
+// ─────────────────────────────────────────────────────────────
+// GOOGLE DRIVE / GOOGLE DOCS LOADER
+// ─────────────────────────────────────────────────────────────
+
+function extractDriveId(url) {
+  // Handles all common Google Drive / Docs URL formats:
+  // https://docs.google.com/document/d/FILE_ID/edit
+  // https://docs.google.com/document/d/FILE_ID/view
+  // https://drive.google.com/file/d/FILE_ID/view
+  // https://drive.google.com/open?id=FILE_ID
+  // https://drive.google.com/uc?id=FILE_ID
+  const patterns = [
+    /\/d\/([a-zA-Z0-9_-]{25,})/,          // /d/FILE_ID
+    /[?&]id=([a-zA-Z0-9_-]{25,})/,        // ?id=FILE_ID or &id=FILE_ID
+  ];
+  for (const rx of patterns) {
+    const m = url.match(rx);
+    if (m) return m[1];
+  }
+  return null;
+}
+
+function getDriveFileType(url) {
+  if (url.includes('docs.google.com/document')) return 'gdoc';
+  if (url.includes('docs.google.com/spreadsheets')) return 'gsheet';
+  if (url.includes('docs.google.com/presentation')) return 'gslides';
+  return 'file'; // generic Drive file — could be PDF, DOCX, TXT
+}
+
+async function loadGoogleDrive() {
+  const input = document.getElementById('drive-url-input');
+  const btn = document.getElementById('drive-btn');
+  const url = input.value.trim();
+
+  if (!url) {
+    alert('Please paste a Google Drive or Google Docs link first.');
+    return;
+  }
+
+  const fileId = extractDriveId(url);
+  if (!fileId) {
+    alert('Could not find a valid Google Drive file ID in that link.\n\nMake sure you copied the full link from the Share dialog.');
+    return;
+  }
+
+  const fileType = getDriveFileType(url);
+  btn.disabled = true;
+  btn.textContent = 'Loading...';
+  showSpinner('Fetching from Google Drive...');
+
+  try {
+    if (fileType === 'gdoc') {
+      await fetchGoogleDoc(fileId, url);
+    } else {
+      // Generic Drive file — try fetching directly
+      await fetchDriveFile(fileId);
+    }
+  } catch (err) {
+    hideSpinner();
+    showDriveError(err.message);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Load';
+  }
+}
+
+async function fetchGoogleDoc(fileId, originalUrl) {
+  // Google Docs: export as plain text via the public export URL
+  // This works as long as the document is shared "Anyone with the link"
+  const exportUrl = `https://docs.google.com/document/d/${fileId}/export?format=txt`;
+
+  const response = await fetchWithCorsProxy(exportUrl);
+
+  if (!response.ok) {
+    if (response.status === 401 || response.status === 403) {
+      throw new Error(
+        'Access denied (403).\n\nMake sure the document is set to "Anyone with the link can view" in Google Docs Share settings.\n\n' +
+        'In Google Docs: Share → Change to "Anyone with the link" → Copy link.'
+      );
+    }
+    if (response.status === 404) {
+      throw new Error('Document not found (404). Check that the link is correct.');
+    }
+    throw new Error(`Google returned an error: HTTP ${response.status}`);
+  }
+
+  const text = await response.text();
+  if (!text.trim()) {
+    throw new Error('The Google Doc appears to be empty.');
+  }
+
+  const docName = 'Google Doc (' + fileId.slice(0, 8) + '...)';
+  setTextareaAndAnalyze(text.trim(), docName);
+}
+
+async function fetchDriveFile(fileId) {
+  // For non-Docs Drive files (PDF, DOCX, TXT)
+  // Use the direct download URL
+  const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+  const response = await fetchWithCorsProxy(downloadUrl);
+
+  if (!response.ok) {
+    if (response.status === 403) {
+      throw new Error(
+        'Access denied.\n\nMake sure the file is shared as "Anyone with the link can view".'
+      );
+    }
+    throw new Error(`Could not fetch the file: HTTP ${response.status}`);
+  }
+
+  const contentType = response.headers.get('content-type') || '';
+  const blob = await response.blob();
+
+  // Detect file type from content-type
+  if (contentType.includes('pdf')) {
+    const file = new File([blob], 'drive-file.pdf', { type: 'application/pdf' });
+    await parsePDF(file, 'Google Drive PDF');
+  } else if (
+    contentType.includes('officedocument.wordprocessingml') ||
+    contentType.includes('docx')
+  ) {
+    const file = new File([blob], 'drive-file.docx', { type: blob.type });
+    await parseDOCX(file, 'Google Drive DOCX');
+  } else if (contentType.includes('text/plain')) {
+    const text = await blob.text();
+    setTextareaAndAnalyze(text.trim(), 'Google Drive Text File');
+  } else if (contentType.includes('text/html')) {
+    // Google sometimes returns an HTML warning page for large files
+    const html = await blob.text();
+    if (html.includes('virus scan') || html.includes('download anyway')) {
+      throw new Error(
+        'Google Drive is showing a virus-scan warning for this file (it\'s too large for direct export).\n\n' +
+        'Download the file manually and use the file upload zone instead.'
+      );
+    }
+    // Strip HTML tags and use the text
+    const text = html.replace(/<[^>]+>/g, ' ').replace(/\s{2,}/g, ' ').trim();
+    setTextareaAndAnalyze(text, 'Google Drive File');
+  } else {
+    // Last resort: try reading as plain text
+    const text = await blob.text();
+    if (text.trim().length > 10) {
+      setTextareaAndAnalyze(text.trim(), 'Google Drive File');
+    } else {
+      throw new Error(
+        'Could not determine the file type (' + contentType + ').\n\n' +
+        'For best results, share Google Docs as a Google Doc (not a PDF or DOCX stored in Drive).'
+      );
+    }
+  }
+}
+
+async function fetchWithCorsProxy(url) {
+  // Try the direct request first (works when CORS allows it)
+  try {
+    const direct = await fetch(url, { mode: 'cors' });
+    return direct;
+  } catch (corsErr) {
+    // Fall back to a public CORS proxy
+    const proxy = 'https://corsproxy.io/?' + encodeURIComponent(url);
+    return fetch(proxy);
+  }
+}
+
+function showDriveError(msg) {
+  alert('Google Drive Error\n\n' + msg);
+}
 
 // ─────────────────────────────────────────────────────────────
 // BUILD REFERENCE CARDS
